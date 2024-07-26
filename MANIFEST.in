@@ -1,0 +1,7 @@
+include setup.py
+include LICENSE
+include NOTICE
+include README.md
+include CHANGELOG.md
+include requirements/base.in
+include requirements/test.in

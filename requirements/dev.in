@@ -1,0 +1,6 @@
+-r test.in
+black
+bumpversion
+pip-tools
+pip-compile-multi
+wheel
