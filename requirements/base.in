@@ -1,3 +1,5 @@
 aiohttp
 certifi
+pycryptodome
 pydantic>=2
+ttldict2

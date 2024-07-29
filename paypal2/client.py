@@ -1,12 +1,19 @@
 import base64
+import json
 import ssl
+import zlib
 from contextlib import asynccontextmanager
 from typing import Optional, Literal, Any
 
 import aiohttp
 import certifi
+from Crypto import Signature
+from Crypto.Hash import SHA256
+from Crypto.PublicKey import RSA
+from Crypto.Signature import pkcs1_15
 from aiohttp import TCPConnector
 from pydantic import BaseModel
+from ttldict2 import TTLDict
 
 from paypal2.models.order import OrdersCreate, OrderMinimalResponse
 from paypal2.models.plan import PlanCreate, PlanDetails, PlanList, PlanMinimalResponse
@@ -51,7 +58,9 @@ class PayPalApiClient:
         "proxy_address",
         "session",
         "session_owned",
+        "webhook_id",
         "_access_token",
+        "_cert_cache",
     )
 
     PRODUCTION_URL_BASE = "https://api-m.paypal.com"
@@ -70,6 +79,7 @@ class PayPalApiClient:
         url_base: str = PRODUCTION_URL_BASE,
         proxy_address: str = None,
         session: aiohttp.ClientSession = None,
+        webhook_id: str = None,
     ):
         self.client_id = client_id
         self.__client_secret = client_secret
@@ -77,8 +87,10 @@ class PayPalApiClient:
         self.proxy_address = proxy_address
         self.session_owned = session is None
         self.session = session
+        self.webhook_id = webhook_id
         # state
         self._access_token = None
+        self._cert_cache = TTLDict(14 * 24 * 60 * 60.0, max_items=10)
 
     async def setup(self, session: aiohttp.ClientSession = None):
         if self.session is None:
@@ -243,3 +255,36 @@ class PayPalApiClient:
 
     # async def plan_update(self, plan_id: str, ops: list[PlanUpdate]):
     #     await self._retry_request("patch", f"/v1/billings/plans/{plan_id}", ops, response_body=False)
+
+    async def verify_process_notification(self, body: bytes, headers: dict[str, str], webhook_id: str = None) -> dict:
+        webhook_id = webhook_id or self.webhook_id
+        if not isinstance(webhook_id, str):
+            raise ValueError("Paypal webhook id not configured")
+        transmission_signature = headers.get("paypal-transmission-sig")
+        transmission_id = headers.get("paypal-transmission-id")
+        transmission_time = headers.get("paypal-transmission-time")
+        transmission_cert_url = headers.get("paypal-cert-url")
+        if (
+            not isinstance(transmission_signature, str)
+            or not isinstance(transmission_id, str)
+            or not isinstance(transmission_time, str)
+            or not isinstance(transmission_cert_url, str)
+        ):
+            raise ValueError("Paypal webhook headers invalid")
+        rsa_pub_key = self._cert_cache.get(transmission_cert_url, touch=True)
+        if not rsa_pub_key:
+            async with self.session.get(transmission_cert_url) as r:
+                r.raise_for_status()
+                transmission_cert = base64.b64decode(await r.read())
+            rsa_pub_key = RSA.import_key(transmission_cert)
+            if rsa_pub_key.has_private():
+                raise ValueError("Paypal webhook transmission key imported as private")
+            self._cert_cache[transmission_cert_url] = rsa_pub_key
+        body_checksum = zlib.crc32(body)
+        message = f"{transmission_id}|{transmission_time}|{webhook_id}|{body_checksum}"
+        hashed = SHA256.new(message.encode())
+        pkcs1_15.new(rsa_pub_key).verify(hashed, base64.b64decode(transmission_signature))
+        data = json.loads(body)
+        if not isinstance(data, dict):
+            raise ValueError("Paypal webhook data is not dict")
+        return data

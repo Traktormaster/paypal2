@@ -3,7 +3,8 @@ import random
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from starlette.requests import Request
 from starlette.responses import HTMLResponse, Response, JSONResponse
 
 from paypal2.client import JsonBadRequest
@@ -55,3 +56,14 @@ async def api_order_create(pp: PayPalDep, req: OrderCreateApiRequest):
 async def api_order_capture(pp: PayPalDep, order_id: str):
     # NOTE: order_id would be validated to be for the current user or at least a known order in production
     return await pp.order_capture(order_id)
+
+
+@app.post("/api/hook")
+async def api_hook(pp: PayPalDep, request: Request):
+    try:
+        data = pp.verify_process_notification(await request.body(), request.headers)
+    except Exception:
+        raise HTTPException(500)
+    # TODO
+    print("HANDLE:", data)
+    return Response()
