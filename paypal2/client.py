@@ -1,7 +1,7 @@
 import base64
 import ssl
 from contextlib import asynccontextmanager
-from typing import Optional, Literal
+from typing import Optional, Literal, Any
 
 import aiohttp
 import certifi
@@ -9,7 +9,7 @@ from aiohttp import TCPConnector
 from pydantic import BaseModel
 
 from paypal2.models.order import OrdersCreate, OrderMinimalResponse
-from paypal2.models.plan import PlanCreate, PlanDetails
+from paypal2.models.plan import PlanCreate, PlanDetails, PlanList, PlanMinimalResponse
 from paypal2.models.product import ProductDetails, ProductCreate, ProductList
 from paypal2.models.subscription import (
     SubscriptionMinimalResponse,
@@ -23,34 +23,60 @@ class AccessTokenReset(Exception):
     pass
 
 
+class JsonBadRequest(aiohttp.ClientResponseError):
+    @classmethod
+    def from_cre(cls, cre: aiohttp.ClientResponseError, data: Any):
+        return cls(
+            cre.request_info,
+            cre.history,
+            code=cre.code,
+            status=cre.status,
+            message=cre.message,
+            headers=cre.headers,
+            data=data,
+        )
+
+    def __init__(self, request_info, history, *, code=None, status=None, message="", headers=None, data=None) -> None:
+        aiohttp.ClientResponseError.__init__(
+            self, request_info, history, code=code, status=status, message=message, headers=headers
+        )
+        self.data = data
+
+
 class PayPalApiClient:
     __slots__ = (
-        "_client_id",
+        "client_id",
         "__client_secret",
+        "url_base",
+        "proxy_address",
         "session",
         "session_owned",
-        "proxy_address",
-        "url_base",
         "_access_token",
     )
 
     PRODUCTION_URL_BASE = "https://api-m.paypal.com"
     SANDBOX_URL_BASE = "https://api-m.sandbox.paypal.com"
 
+    @classmethod
+    def init_session(cls):
+        return aiohttp.ClientSession(
+            connector=TCPConnector(ssl=ssl.create_default_context(cafile=certifi.where()), limit=16)
+        )
+
     def __init__(
         self,
         client_id: str,
         client_secret: str,
-        session: aiohttp.ClientSession = None,
         url_base: str = PRODUCTION_URL_BASE,
         proxy_address: str = None,
+        session: aiohttp.ClientSession = None,
     ):
-        self._client_id = client_id
+        self.client_id = client_id
         self.__client_secret = client_secret
-        self.session_owned = session is None
-        self.session = session
         self.url_base = url_base
         self.proxy_address = proxy_address
+        self.session_owned = session is None
+        self.session = session
         # state
         self._access_token = None
 
@@ -58,9 +84,7 @@ class PayPalApiClient:
         if self.session is None:
             self.session_owned = session is None
             if self.session_owned:
-                session = aiohttp.ClientSession(
-                    connector=TCPConnector(ssl=ssl.create_default_context(cafile=certifi.where()), limit=16)
-                )
+                session = self.init_session()
             self.session = session
 
     async def close(self):
@@ -70,11 +94,11 @@ class PayPalApiClient:
             self.session = None
 
     async def _get_access_token(self):
-        token = base64.b64encode(f"{self._client_id}:{self.__client_secret}".encode()).decode()
+        token = base64.b64encode(f"{self.client_id}:{self.__client_secret}".encode()).decode()
         async with self.session.post(
             self.url_base + "/v1/oauth2/token",
             data="grant_type=client_credentials",
-            headers={"Authorization": f"Bearer {token}"},
+            headers={"Content-Type": "application/x-www-form-urlencoded", "Authorization": f"Basic {token}"},
             proxy=self.proxy_address,
         ) as resp:
             resp.raise_for_status()
@@ -85,9 +109,9 @@ class PayPalApiClient:
         return access_token
 
     @asynccontextmanager
-    async def _access_token(self, raise_reset: bool = False):
+    async def _manage_access_token(self, raise_reset: bool = False):
         if not self._access_token:
-            self._access_token = await self._access_token()
+            self._access_token = await self._get_access_token()
         access_token = self._access_token
         try:
             yield access_token
@@ -111,27 +135,37 @@ class PayPalApiClient:
         j = body.model_dump(exclude_unset=True) if isinstance(body, BaseModel) else body
         for i in range(1, retry + 1):
             try:
-                async with self._access_token(raise_reset=i < retry) as access_token:
+                async with self._manage_access_token(raise_reset=i < retry) as access_token:
                     hs = {"Authorization": f"Bearer {access_token}"}
                     if headers:
                         hs.update(headers)
                     async with getattr(self.session, method)(
                         self.url_base + url, json=j, headers=hs, proxy=self.proxy_address
                     ) as resp:
-                        resp.raise_for_status()
+                        try:
+                            resp.raise_for_status()
+                        except aiohttp.ClientResponseError as e:
+                            if e.status == 400:
+                                try:
+                                    details = await resp.json()
+                                except Exception:
+                                    raise e
+                                else:
+                                    raise JsonBadRequest.from_cre(e, details)
+                            raise e
                         if response_body:
                             return await resp.json()
             except AccessTokenReset:
                 pass
 
-    async def create_order(self, request: OrdersCreate) -> OrderMinimalResponse:
+    async def order_create(self, request: OrdersCreate) -> OrderMinimalResponse:
         """
         Create an order for purchase approval.
         """
         data = await self._retry_request("post", "/v2/checkout/orders", request)
         return OrderMinimalResponse.model_validate(data)
 
-    async def capture_order(self, order_id: str) -> OrderMinimalResponse:
+    async def order_capture(self, order_id: str) -> OrderMinimalResponse:
         """
         :param order_id: Must be checked that this service created the order previously, and knows how to handle the
             capture if it is completed.
@@ -142,7 +176,7 @@ class PayPalApiClient:
         )
         return OrderMinimalResponse.model_validate(data)
 
-    async def create_subscription(self, request: SubscriptionCreate) -> SubscriptionMinimalResponse:
+    async def subscription_create(self, request: SubscriptionCreate) -> SubscriptionMinimalResponse:
         """
         Create a subscription for client approval.
         """
@@ -190,17 +224,17 @@ class PayPalApiClient:
             raise e
         return ProductDetails.model_validate(data)
 
-    async def create_plan(self, request: PlanCreate):
-        data = await self._retry_request("post", "/v2/billing/plans", request)
-        if not isinstance(data, dict):
-            raise ValueError("PayPal api response not dict")
-        if not isinstance(data.get("id"), str):
-            raise ValueError("PayPal create-order api response has no valid id")
-        return data
+    async def plan_create(self, request: PlanCreate) -> PlanMinimalResponse:
+        data = await self._retry_request("post", "/v1/billing/plans", request)
+        return PlanMinimalResponse.model_validate(data)
+
+    async def plan_list(self) -> PlanList:
+        data = await self._retry_request("get", "/v1/billing/plans")
+        return PlanList.model_validate(data)
 
     async def plan_details(self, plan_id: str) -> Optional[PlanDetails]:
         try:
-            data = await self._retry_request("get", f"/v1/billings/plans/{plan_id}")
+            data = await self._retry_request("get", f"/v1/billing/plans/{plan_id}")
         except aiohttp.ClientResponseError as e:
             if e.status == 404:
                 return None

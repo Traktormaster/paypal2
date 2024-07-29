@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Testing server for paypal2 lib</title>
+    </head>
+    <body>
+        <h1>Order testing</h1>
+        <div id="paypal-button-order"></div>
+        <div id="result-order"></div>
+        <h1>Subscription testing</h1>
+        <input id="sub-plan-id" type="hidden" value="%(plan_id)s" />
+        <div id="paypal-button-sub"></div>
+        <div id="result-sub"></div>
+
+        <script src="https://www.paypal.com/sdk/js?client-id=%(client_id)s&buyer-country=US&currency=USD&components=buttons" data-namespace="paypal_one_time"></script>
+        <script src="https://www.paypal.com/sdk/js?client-id=%(client_id)s&buyer-country=US&currency=USD&components=buttons&intent=subscription&vault=true" data-namespace="paypal_subscriptions"></script>
+        <script src="app.js"></script>
+    </body>
+</html>

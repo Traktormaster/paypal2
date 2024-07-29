@@ -4,16 +4,16 @@ from pydantic import BaseModel, Field
 
 
 class _ProductMinimalCommon(BaseModel):
-    id: Optional[str] = Field(min_length=6, max_length=50)
-    name: Optional[str] = Field(min_length=1, max_length=127)
-    description: Optional[str] = Field(min_length=1, max_length=256)
+    id: Optional[str] = Field(min_length=6, max_length=50, default=None)
+    name: Optional[str] = Field(min_length=1, max_length=127, default=None)
+    description: Optional[str] = Field(min_length=1, max_length=256, default=None)
 
 
 class _ProductCommon(_ProductMinimalCommon):
-    type: Optional[Literal["DIGITAL", "PHYSICAL", "SERVICE"]] = Field(min_length=1, max_length=24)
-    category: Optional[str] = Field(min_length=4, max_length=256, pattern=r"^[A-Z_]+$")
-    image_url: Optional[str] = Field(min_length=1, max_length=2000)
-    home_url: Optional[str] = Field(min_length=1, max_length=2000)
+    type: Optional[Literal["DIGITAL", "PHYSICAL", "SERVICE"]] = Field(min_length=1, max_length=24, default=None)
+    category: Optional[str] = Field(min_length=4, max_length=256, pattern=r"^[A-Z_]+$", default=None)
+    image_url: Optional[str] = Field(min_length=1, max_length=2000, default=None)
+    home_url: Optional[str] = Field(min_length=1, max_length=2000, default=None)
 
 
 class ProductDetails(_ProductCommon):
@@ -36,6 +36,6 @@ class ProductListProduct(_ProductMinimalCommon):
 
 class ProductList(BaseModel):
     products: list[ProductListProduct]
-    total_items: int
-    total_pages: int
+    total_items: Optional[int] = None
+    total_pages: Optional[int] = None
     # todo links
