@@ -6,56 +6,17 @@ from typing import Optional, Literal
 import aiohttp
 import certifi
 from aiohttp import TCPConnector
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
-
-class MonetaryValue(BaseModel):
-    currency_code: str = Field(min_length=3, max_length=3)
-    value: str = Field(max_length=32)
-
-
-class Breakdown(BaseModel):
-    item_total: Optional[MonetaryValue]
-    shipping: Optional[MonetaryValue]
-    handling: Optional[MonetaryValue]
-    tax_total: Optional[MonetaryValue]
-    insurance: Optional[MonetaryValue]
-    shipping_discount: Optional[MonetaryValue]
-    discount: Optional[MonetaryValue]
-
-
-class MonetaryValueWithBreakdown(MonetaryValue):
-    breakdown: Optional[Breakdown]
-
-
-class Item(BaseModel):
-    name: str = Field(min_length=1, max_length=127)
-    quantity: str = Field(min_length=1, max_length=10)
-    description: Optional[str] = Field(min_length=1, max_length=127)
-    sku: Optional[str] = Field(min_length=1, max_length=127)
-    url: Optional[str] = Field(min_length=1, max_length=2048)
-    category: Optional[Literal["DIGITAL_GOODS", "PHYSICAL_GOODS", "DONATION"]] = Field(min_length=1, max_length=20)
-    image_url: Optional[str] = Field(
-        min_length=1, max_length=2048, pattern=r"^(https:)([/|.|\w|\s|-])*\.(?:jpg|gif|png|jpeg|JPG|GIF|PNG|JPEG)"
-    )
-    unit_amount: MonetaryValue  # purchase_units[].amount.breakdown.item_total must be set if present
-    tax: Optional[MonetaryValue]  # purchase_units[].amount.breakdown.tax_total must be set if present
-    # TODO: upc
-
-
-class PurchaseUnit(BaseModel):
-    reference_id: Optional[str] = Field(min_length=1, max_length=256)
-    description: Optional[str] = Field(min_length=1, max_length=127)
-    custom_id: Optional[str] = Field(min_length=1, max_length=256)
-    invoice_id: Optional[str] = Field(min_length=1, max_length=256)
-    soft_descriptor: Optional[str] = Field(min_length=1, max_length=22)
-    items: Optional[list[Item]]
-
-
-class OrdersCreate(BaseModel):
-    purchase_units: list[PurchaseUnit] = Field(min_length=1, max_length=10)
-    category: Optional[Literal["CAPTURE", "AUTHORIZE"]]
-    # TODO: payment_source
+from paypal2.models.order import OrdersCreate, OrderMinimalResponse
+from paypal2.models.plan import PlanCreate, PlanDetails
+from paypal2.models.product import ProductDetails, ProductCreate, ProductList
+from paypal2.models.subscription import (
+    SubscriptionMinimalResponse,
+    SubscriptionCreate,
+    SubscriptionDetails,
+    SubscriptionReason,
+)
 
 
 class AccessTokenReset(Exception):
@@ -124,7 +85,7 @@ class PayPalApiClient:
         return access_token
 
     @asynccontextmanager
-    async def _access_token(self):
+    async def _access_token(self, raise_reset: bool = False):
         if not self._access_token:
             self._access_token = await self._access_token()
         access_token = self._access_token
@@ -134,34 +95,117 @@ class PayPalApiClient:
             if e.status == 401:
                 if self._access_token == access_token:
                     self._access_token = None
+                if raise_reset:
                     raise AccessTokenReset() from e
             raise e
 
-    async def _retry_post(self, url: str, body: BaseModel | dict, headers: dict[str, str] = None):
+    async def _retry_request(
+        self,
+        method: Literal["get"] | Literal["post"] | Literal["patch"],
+        url: str,
+        body: BaseModel | dict | list | None = None,
+        headers: dict[str, str] = None,
+        retry: int = 2,
+        response_body: bool = True,
+    ):
         j = body.model_dump(exclude_unset=True) if isinstance(body, BaseModel) else body
-        for i in range(2):
+        for i in range(1, retry + 1):
             try:
-                async with self._access_token() as access_token:
-
+                async with self._access_token(raise_reset=i < retry) as access_token:
                     hs = {"Authorization": f"Bearer {access_token}"}
                     if headers:
                         hs.update(headers)
-                    async with self.session.post(
+                    async with getattr(self.session, method)(
                         self.url_base + url, json=j, headers=hs, proxy=self.proxy_address
                     ) as resp:
                         resp.raise_for_status()
-                        return await resp.json()
+                        if response_body:
+                            return await resp.json()
             except AccessTokenReset:
-                if i != 0:
-                    raise
+                pass
 
-    async def create_order(self, request: OrdersCreate):
-        data = await self._retry_post("/v2/checkout/orders", request)
-        # TODO: validate data
-        data.get("id")  # record order id for account
-        data.get("links")  # return approve link to client
+    async def create_order(self, request: OrdersCreate) -> OrderMinimalResponse:
+        """
+        Create an order for purchase approval.
+        """
+        data = await self._retry_request("post", "/v2/checkout/orders", request)
+        return OrderMinimalResponse.model_validate(data)
 
-    async def capture_order(self, order_id: str):
-        data = await self._retry_post(f"/v2/checkout/orders/{order_id}/capture", {}, {"Prefer": "return=minimal"})
-        # TODO: validate data
-        data.get("status") == "COMPLETED"
+    async def capture_order(self, order_id: str) -> OrderMinimalResponse:
+        """
+        :param order_id: Must be checked that this service created the order previously, and knows how to handle the
+            capture if it is completed.
+        :return: the status property indicates success if "COMPLETED"
+        """
+        data = await self._retry_request(
+            "post", f"/v2/checkout/orders/{order_id}/capture", {}, {"Prefer": "return=minimal"}
+        )
+        return OrderMinimalResponse.model_validate(data)
+
+    async def create_subscription(self, request: SubscriptionCreate) -> SubscriptionMinimalResponse:
+        """
+        Create a subscription for client approval.
+        """
+        data = await self._retry_request("post", "/v1/billing/subscriptions", request)
+        return SubscriptionMinimalResponse.model_validate(data)
+
+    async def subscription_details(self, subscription_id: str) -> Optional[SubscriptionDetails]:
+        try:
+            data = await self._retry_request("get", f"/v1/billing/subscriptions/{subscription_id}")
+        except aiohttp.ClientResponseError as e:
+            if e.status == 404:
+                return None
+            raise e
+        return SubscriptionDetails.model_validate(data)
+
+    async def subscription_activate(self, subscription_id: str, request: SubscriptionReason):
+        await self._retry_request(
+            "post", f"/v1/billing/subscriptions/{subscription_id}/activate", request, response_body=False
+        )
+
+    async def subscription_suspend(self, subscription_id: str, request: SubscriptionReason):
+        await self._retry_request(
+            "post", f"/v1/billing/subscriptions/{subscription_id}/suspend", request, response_body=False
+        )
+
+    async def subscription_cancel(self, subscription_id: str, request: SubscriptionReason):
+        await self._retry_request(
+            "post", f"/v1/billing/subscriptions/{subscription_id}/cancel", request, response_body=False
+        )
+
+    async def product_create(self, request: ProductCreate) -> ProductDetails:
+        data = await self._retry_request("post", "/v1/catalogs/products", request, {"Prefer": "return=representation"})
+        return ProductDetails.model_validate(data)
+
+    async def product_list(self) -> ProductList:
+        data = await self._retry_request("get", "/v1/catalogs/products")
+        return ProductList.model_validate(data)
+
+    async def product_details(self, product_id: str) -> Optional[ProductDetails]:
+        try:
+            data = await self._retry_request("get", f"/v1/catalogs/products/{product_id}")
+        except aiohttp.ClientResponseError as e:
+            if e.status == 404:
+                return None
+            raise e
+        return ProductDetails.model_validate(data)
+
+    async def create_plan(self, request: PlanCreate):
+        data = await self._retry_request("post", "/v2/billing/plans", request)
+        if not isinstance(data, dict):
+            raise ValueError("PayPal api response not dict")
+        if not isinstance(data.get("id"), str):
+            raise ValueError("PayPal create-order api response has no valid id")
+        return data
+
+    async def plan_details(self, plan_id: str) -> Optional[PlanDetails]:
+        try:
+            data = await self._retry_request("get", f"/v1/billings/plans/{plan_id}")
+        except aiohttp.ClientResponseError as e:
+            if e.status == 404:
+                return None
+            raise e
+        return PlanDetails.model_validate(data)
+
+    # async def plan_update(self, plan_id: str, ops: list[PlanUpdate]):
+    #     await self._retry_request("patch", f"/v1/billings/plans/{plan_id}", ops, response_body=False)
