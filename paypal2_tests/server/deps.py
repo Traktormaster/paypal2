@@ -19,7 +19,8 @@ class GlobalDeps:
     async def setup(cls):
         client_id = os.environ["PAYPAL2_TESTING_CLIENT_ID"]
         client_secret = os.environ["PAYPAL2_TESTING_CLIENT_SECRET"]
-        pp = PayPalApiClient(client_id, client_secret, url_base=PayPalApiClient.SANDBOX_URL_BASE)
+        webhook_id = os.environ.get("PAYPAL2_TESTING_WEBHOOK_ID")
+        pp = PayPalApiClient(client_id, client_secret, url_base=PayPalApiClient.SANDBOX_URL_BASE, webhook_id=webhook_id)
         await pp.setup()
         cls.PAYPAL = pp
         await cls._setup_subscription_plan(pp)
