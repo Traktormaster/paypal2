@@ -11,9 +11,19 @@ from werkzeug import Request, Response
 
 from paypal2_tests.const import (
     HOOK_CERTS,
-    HOOK_SUBSCRIPTION_CREATED_v1_0,
-    HOOK_SUBSCRIPTION_CREATED_v2_0,
+    HOOK_SUBSCRIPTION_CREATED_v1,
+    HOOK_SUBSCRIPTION_CREATED_v2,
     HOOK_PAYMENT_SALE_COMPLETED,
+    HOOK_SUBSCRIPTION_EXPIRED_V2,
+    HOOK_SUBSCRIPTION_CANCELLED_V2,
+    HOOK_SUBSCRIPTION_PAYMENT_FAILED_V2,
+    HOOK_PAYMENT_SALE_REVERSED,
+    HOOK_PAYMENT_SALE_REFUNDED,
+    HOOK_PLAN_CREATED_V2,
+    HOOK_PLAN_UPDATED_V2,
+    HOOK_SUBSCRIPTION_CANCELLED_V1,
+    HOOK_PLAN_CREATED_V1,
+    HOOK_PLAN_UPDATED_V1,
 )
 from paypal2_tests.server.hooks import WEBHOOK_HANDLERS
 from paypal2_tests.utility import ServerProc
@@ -69,7 +79,22 @@ async def _webhook_check(server_proc: ServerProc, httpserver: HTTPServer):
                     return d_["results"][0]
 
         await _get_webhook_result(ignore=True)  # clear remaining if any
-        for const_req in [HOOK_SUBSCRIPTION_CREATED_v2_0, HOOK_PAYMENT_SALE_COMPLETED, HOOK_SUBSCRIPTION_CREATED_v1_0]:
+        for const_req in [
+            HOOK_SUBSCRIPTION_CREATED_v2,
+            HOOK_SUBSCRIPTION_EXPIRED_V2,
+            HOOK_SUBSCRIPTION_CANCELLED_V2,
+            HOOK_SUBSCRIPTION_PAYMENT_FAILED_V2,
+            HOOK_PAYMENT_SALE_COMPLETED,
+            HOOK_PAYMENT_SALE_REVERSED,
+            HOOK_PAYMENT_SALE_REFUNDED,
+            HOOK_PLAN_CREATED_V2,
+            HOOK_PLAN_UPDATED_V2,
+            # rest is deprecated, the fallback handler can catch them
+            HOOK_SUBSCRIPTION_CREATED_v1,
+            HOOK_SUBSCRIPTION_CANCELLED_V1,
+            HOOK_PLAN_CREATED_V1,
+            HOOK_PLAN_UPDATED_V1,
+        ]:
             headers = dict(const_req.headers)
             headers["paypal-cert-url"] = headers["paypal-cert-url"].replace("https://api.paypal.com/", base_url)
             async with s.post(server_proc.url + "/api/hook", data=const_req.body, headers=headers) as r:
