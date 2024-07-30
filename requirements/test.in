@@ -2,4 +2,5 @@
 fastapi
 pytest
 pytest-asyncio
+pytest-httpserver
 pytest-selenium

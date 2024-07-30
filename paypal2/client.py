@@ -3,11 +3,11 @@ import json
 import ssl
 import zlib
 from contextlib import asynccontextmanager
-from typing import Optional, Literal, Any
+from datetime import datetime, timezone, timedelta
+from typing import Optional, Literal, Any, Type, TypeVar, Callable, Awaitable
 
 import aiohttp
 import certifi
-from Crypto import Signature
 from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA
 from Crypto.Signature import pkcs1_15
@@ -15,7 +15,9 @@ from aiohttp import TCPConnector
 from pydantic import BaseModel
 from ttldict2 import TTLDict
 
+from paypal2.models.hook import WebHookEvent
 from paypal2.models.order import OrdersCreate, OrderMinimalResponse
+from paypal2.models.payment import CapturedPayment
 from paypal2.models.plan import PlanCreate, PlanDetails, PlanList, PlanMinimalResponse
 from paypal2.models.product import ProductDetails, ProductCreate, ProductList
 from paypal2.models.subscription import (
@@ -23,6 +25,7 @@ from paypal2.models.subscription import (
     SubscriptionCreate,
     SubscriptionDetails,
     SubscriptionReason,
+    SubscriptionTransactionList,
 )
 
 
@@ -50,6 +53,10 @@ class JsonBadRequest(aiohttp.ClientResponseError):
         self.data = data
 
 
+_WebHookEventType = TypeVar("_WebHookEventType", bound=WebHookEvent)
+WebHookHandler = Callable[[_WebHookEventType, dict[str, Any]], Awaitable[Any]]
+
+
 class PayPalApiClient:
     __slots__ = (
         "client_id",
@@ -59,6 +66,7 @@ class PayPalApiClient:
         "session",
         "session_owned",
         "webhook_id",
+        "webhook_handlers",
         "_access_token",
         "_cert_cache",
     )
@@ -80,6 +88,7 @@ class PayPalApiClient:
         proxy_address: str = None,
         session: aiohttp.ClientSession = None,
         webhook_id: str = None,
+        webhook_handlers: dict[Type[_WebHookEventType], WebHookHandler] = None,
     ):
         self.client_id = client_id
         self.__client_secret = client_secret
@@ -88,6 +97,7 @@ class PayPalApiClient:
         self.session_owned = session is None
         self.session = session
         self.webhook_id = webhook_id
+        self.webhook_handlers = {e.HANDLER_KEY: (e, h) for e, h in (webhook_handlers or {}).items()}
         # state
         self._access_token = None
         self._cert_cache = TTLDict(14 * 24 * 60 * 60.0, max_items=10)
@@ -141,6 +151,7 @@ class PayPalApiClient:
         url: str,
         body: BaseModel | dict | list | None = None,
         headers: dict[str, str] = None,
+        params: Optional[dict[str, str]] = None,
         retry: int = 2,
         response_body: bool = True,
     ):
@@ -152,7 +163,7 @@ class PayPalApiClient:
                     if headers:
                         hs.update(headers)
                     async with getattr(self.session, method)(
-                        self.url_base + url, json=j, headers=hs, proxy=self.proxy_address
+                        self.url_base + url, json=j, headers=hs, params=params, proxy=self.proxy_address
                     ) as resp:
                         try:
                             resp.raise_for_status()
@@ -219,6 +230,28 @@ class PayPalApiClient:
             "post", f"/v1/billing/subscriptions/{subscription_id}/cancel", request, response_body=False
         )
 
+    async def subscription_transaction_list(
+        self, subscription_id: str, start_time: datetime = None, end_time: datetime = None
+    ) -> Optional[SubscriptionTransactionList]:
+        if not start_time:
+            start_time = datetime.utcnow() - timedelta(minutes=60)
+        if not end_time:
+            end_time = datetime.utcnow() + timedelta(minutes=10)
+        try:
+            data = await self._retry_request(
+                "get",
+                f"/v1/billing/subscriptions/{subscription_id}/transactions",
+                params={
+                    "start_time": start_time.replace(tzinfo=timezone.utc).isoformat(timespec="seconds"),
+                    "end_time": end_time.replace(tzinfo=timezone.utc).isoformat(timespec="seconds"),
+                },
+            )
+        except aiohttp.ClientResponseError as e:
+            if e.status == 404:
+                return None
+            raise e
+        return SubscriptionTransactionList.model_validate(data)
+
     async def product_create(self, request: ProductCreate) -> ProductDetails:
         data = await self._retry_request("post", "/v1/catalogs/products", request, {"Prefer": "return=representation"})
         return ProductDetails.model_validate(data)
@@ -256,10 +289,25 @@ class PayPalApiClient:
     # async def plan_update(self, plan_id: str, ops: list[PlanUpdate]):
     #     await self._retry_request("patch", f"/v1/billings/plans/{plan_id}", ops, response_body=False)
 
-    async def verify_process_notification(self, body: bytes, headers: dict[str, str], webhook_id: str = None) -> dict:
+    async def captured_payment_details(self, capture_id: str) -> Optional[CapturedPayment]:
+        try:
+            data = await self._retry_request("get", f"/v2/payments/captures/{capture_id}")
+        except aiohttp.ClientResponseError as e:
+            if e.status == 404:
+                return None
+            raise e
+        return CapturedPayment.model_validate(data)
+
+    async def verify_webhook_notification(self, body: bytes, headers: dict[str, str], webhook_id: str = None) -> dict:
+        """
+        WebHook notification verification.
+        """
         webhook_id = webhook_id or self.webhook_id
         if not isinstance(webhook_id, str):
             raise ValueError("Paypal webhook id not configured")
+        transmission_auth_algo = headers.get("paypal-auth-algo", "SHA256withRSA")  # default
+        if transmission_auth_algo != "SHA256withRSA":
+            raise ValueError(f"Paypal webhook signature algorithm not supported: {transmission_auth_algo}")
         transmission_signature = headers.get("paypal-transmission-sig")
         transmission_id = headers.get("paypal-transmission-id")
         transmission_time = headers.get("paypal-transmission-time")
@@ -275,7 +323,7 @@ class PayPalApiClient:
         if not rsa_pub_key:
             async with self.session.get(transmission_cert_url) as r:
                 r.raise_for_status()
-                transmission_cert = base64.b64decode(await r.read())
+                transmission_cert = await r.read()
             rsa_pub_key = RSA.import_key(transmission_cert)
             if rsa_pub_key.has_private():
                 raise ValueError("Paypal webhook transmission key imported as private")
@@ -288,3 +336,17 @@ class PayPalApiClient:
         if not isinstance(data, dict):
             raise ValueError("Paypal webhook data is not dict")
         return data
+
+    async def process_webhook_notification(self, data: dict, **context):
+        """
+        Automatic WebHook (verified) data loading, handler selection and processing.
+        """
+        handler_key = (data.get("event_type"), data.get("resource_type"), data.get("resource_version", "1.0"))
+        event_handler = self.webhook_handlers.get(handler_key)
+        if not event_handler:
+            event_handler = self.webhook_handlers.get(None)  # try fallback if it is registered
+        if not event_handler:
+            return
+        event = event_handler[0].model_validate(data)
+        context["pp"] = self
+        return await event_handler[1](event, context)

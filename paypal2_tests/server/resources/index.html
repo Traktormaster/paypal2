@@ -9,9 +9,19 @@
         <div id="paypal-button-order"></div>
         <div id="result-order"></div>
         <h1>Subscription testing</h1>
+        <input id="sub-custom-id" type="text" value="test-003-account-id-2" />
         <input id="sub-plan-id" type="hidden" value="%(plan_id)s" />
         <div id="paypal-button-sub"></div>
         <div id="result-sub"></div>
+        <h1>Payment details</h1>
+        <input id="payment-id" type="text" value="" />
+        <input id="payment-id-btn" type="button" value="Submit" />
+        <div id="result-payment"></div>
+        <h1>Subscription details</h1>
+        <input id="subdet-id" type="text" value="" />
+        <input id="subdet-id-btn1" type="button" value="Details" />
+        <input id="subdet-id-btn2" type="button" value="Transactions" />
+        <div id="result-subdet"></div>
 
         <script src="https://www.paypal.com/sdk/js?client-id=%(client_id)s&buyer-country=US&currency=USD&components=buttons" data-namespace="paypal_one_time"></script>
         <script src="https://www.paypal.com/sdk/js?client-id=%(client_id)s&buyer-country=US&currency=USD&components=buttons&intent=subscription&vault=true" data-namespace="paypal_subscriptions"></script>

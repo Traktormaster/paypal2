@@ -99,7 +99,8 @@ const order_options = {
 const sub_options = {
     createSubscription(data, actions) {
           return actions.subscription.create({
-              "plan_id": document.getElementById("sub-plan-id").value
+              "plan_id": document.getElementById("sub-plan-id").value,
+              "custom_id": document.getElementById("sub-custom-id").value,
           });
       },
     onApprove(data) {
@@ -122,3 +123,32 @@ function setup_sub(){
 
 setup_order();
 setup_sub();
+
+// payment details
+document.getElementById("payment-id-btn").onclick = function(){
+    fetch(`/api/payment/${document.getElementById("payment-id").value}`, {
+          method: "POST",
+          headers: {},
+        }).then(function(response) {
+        return response.json();
+    }).then(function(txt){console.log("PAYMENT", txt);document.getElementById("result-payment").innerText = txt;});
+};
+
+// subscription details
+document.getElementById("subdet-id-btn1").onclick = function(){
+    fetch(`/api/subscription/${document.getElementById("subdet-id").value}`, {
+          method: "POST",
+          headers: {},
+        }).then(function(response) {
+        return response.json();
+    }).then(function(txt){console.log("sub details", txt);document.getElementById("result-subdet").innerText = txt;});
+};
+
+document.getElementById("subdet-id-btn2").onclick = function(){
+    fetch(`/api/subscription-tx/${document.getElementById("subdet-id").value}`, {
+          method: "POST",
+          headers: {},
+        }).then(function(response) {
+        return response.json();
+    }).then(function(txt){console.log("sub txs", txt);document.getElementById("result-subdet").innerText = txt;});
+};

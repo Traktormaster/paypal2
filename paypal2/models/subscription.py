@@ -42,3 +42,16 @@ class SubscriptionDetails(BaseModel):
 
 class SubscriptionReason(BaseModel):
     reason: str = Field(min_length=1, max_length=127)
+
+
+class SubscriptionTransaction(BaseModel):
+    id: str
+    status: str
+    time: str
+
+
+class SubscriptionTransactionList(BaseModel):
+    transactions: list[SubscriptionTransaction]
+    total_items: Optional[int] = None
+    total_pages: Optional[int] = None
+    # todo links

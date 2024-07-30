@@ -2,15 +2,18 @@ import os
 import random
 from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import Optional
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, Response, JSONResponse
 
 from paypal2.client import JsonBadRequest
 from paypal2.models.order import OrderMinimalResponse
+from paypal2.models.payment import CapturedPayment
+from paypal2.models.subscription import SubscriptionDetails, SubscriptionTransactionList
 from paypal2.utility import simple_single_order_create
-from paypal2_tests.server.deps import GlobalDeps, PayPalDep
+from paypal2_tests.server.deps import GlobalDeps, PayPalDep, WebHookResults
 from paypal2_tests.server.model import OrderCreateApiRequest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -59,11 +62,36 @@ async def api_order_capture(pp: PayPalDep, order_id: str):
 
 
 @app.post("/api/hook")
-async def api_hook(pp: PayPalDep, request: Request):
-    try:
-        data = pp.verify_process_notification(await request.body(), request.headers)
-    except Exception:
-        raise HTTPException(500)
-    # TODO
-    print("HANDLE:", data)
+async def api_hook(pp: PayPalDep, whr: WebHookResults, request: Request):
+    data = await pp.verify_webhook_notification(await request.body(), request.headers)
+    result = await pp.process_webhook_notification(data, whr=whr)
+    print("_WEBHOOK_RESULT", result)
     return Response()
+
+
+@app.post("/api/webhook-results")
+async def api_webhook_results(whr: WebHookResults):
+    buf = []
+    while True:
+        try:
+            item = whr.popleft()
+        except IndexError:
+            break
+        else:
+            buf.append(item)
+    return JSONResponse({"results": buf})
+
+
+@app.post("/api/payment/{payment_id}", response_model=Optional[CapturedPayment])
+async def api_payment_details(pp: PayPalDep, payment_id: str):
+    return await pp.captured_payment_details(payment_id)
+
+
+@app.post("/api/subscription/{subscription_id}", response_model=Optional[SubscriptionDetails])
+async def api_subscription_details(pp: PayPalDep, subscription_id: str):
+    return await pp.subscription_details(subscription_id)
+
+
+@app.post("/api/subscription-tx/{subscription_id}", response_model=Optional[SubscriptionTransactionList])
+async def api_subscription_details(pp: PayPalDep, subscription_id: str):
+    return await pp.subscription_transaction_list(subscription_id)
