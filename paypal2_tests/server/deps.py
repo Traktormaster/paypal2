@@ -5,34 +5,31 @@ from typing import Annotated
 from fastapi import Depends
 
 from paypal2.client import PayPalApiClient
+from paypal2.integration.deps import PayPalDeps
 from paypal2.models.common import MonetaryValue
 from paypal2.models.plan import PlanCreate, BillingCycle, Frequency, PricingModel, PlanPaymentPreferences
 from paypal2.models.product import ProductCreate
 from paypal2_tests.server.hooks import WEBHOOK_HANDLERS
 
 
-class GlobalDeps:
+class GlobalDeps(PayPalDeps):
     PAYPAL: PayPalApiClient = None
-    WEBHOOK_RESULTS = deque()
+    WEBHOOK_RESULTS: deque = None
     PRODUCT_ID: str = None
     PLAN_NAME: str = None
     PLAN_ID: str = None
 
     @classmethod
     async def setup(cls):
-        client_id = os.environ["PAYPAL2_TESTING_CLIENT_ID"]
-        client_secret = os.environ["PAYPAL2_TESTING_CLIENT_SECRET"]
-        webhook_id = os.environ.get("PAYPAL2_TESTING_WEBHOOK_ID", "WEBHOOK_ID")  # "WEBHOOK_ID" is for simulated calls
-        pp = PayPalApiClient(
-            client_id,
-            client_secret,
-            url_base=PayPalApiClient.SANDBOX_URL_BASE,
-            webhook_id=webhook_id,
-            webhook_handlers=WEBHOOK_HANDLERS,
+        cls.WEBHOOK_RESULTS = deque()
+        await cls.setup_paypal(
+            os.environ["PAYPAL2_TESTING_CLIENT_ID"],
+            os.environ["PAYPAL2_TESTING_CLIENT_SECRET"],
+            os.environ.get("PAYPAL2_TESTING_WEBHOOK_ID", "WEBHOOK_ID"),  # "WEBHOOK_ID" is for simulated calls
+            WEBHOOK_HANDLERS,
         )
-        await pp.setup()
-        cls.PAYPAL = pp
-        await cls._setup_subscription_plan(pp)
+        cls.PAYPAL.url_base = cls.PAYPAL.SANDBOX_URL_BASE
+        await cls._setup_subscription_plan(cls.PAYPAL)
 
     @classmethod
     async def _setup_subscription_plan(cls, pp: PayPalApiClient):
@@ -75,15 +72,8 @@ class GlobalDeps:
 
     @classmethod
     async def close(cls):
-        if cls.PAYPAL:
-            await cls.PAYPAL.close()
-
-    @classmethod
-    def get_paypal(cls) -> PayPalApiClient:
-        pp = cls.PAYPAL
-        if not pp:
-            raise Exception("PAYPAL dep has not been set up")
-        return pp
+        cls.WEBHOOK_RESULTS.clear()
+        await cls.close_paypal()
 
 
 PayPalDep = Annotated[PayPalApiClient, Depends(GlobalDeps.get_paypal)]

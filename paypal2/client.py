@@ -4,7 +4,8 @@ import ssl
 import zlib
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone, timedelta
-from typing import Optional, Literal, Any, Type, TypeVar, Callable, Awaitable
+from typing import Optional, Literal
+from typing import TypeVar, Awaitable, Any, Callable, Type
 
 import aiohttp
 import certifi
@@ -16,7 +17,8 @@ from pydantic import BaseModel
 from ttldict2 import TTLDict
 
 from paypal2.models.hook import WebHookEvent
-from paypal2.models.order import OrdersCreate, OrderMinimalResponse
+from paypal2.models.order import OrderMinimalResponse
+from paypal2.models.order import OrdersCreate
 from paypal2.models.payment import CapturedPayment
 from paypal2.models.plan import PlanCreate, PlanDetails, PlanList, PlanMinimalResponse
 from paypal2.models.product import ProductDetails, ProductCreate, ProductList
@@ -55,6 +57,7 @@ class JsonBadRequest(aiohttp.ClientResponseError):
 
 _WebHookEventType = TypeVar("_WebHookEventType", bound=WebHookEvent)
 WebHookHandler = Callable[[_WebHookEventType, dict[str, Any]], Awaitable[Any]]
+WebHookHandlers = dict[Type[_WebHookEventType], WebHookHandler]
 
 
 class PayPalApiClient:
@@ -88,7 +91,7 @@ class PayPalApiClient:
         proxy_address: str = None,
         session: aiohttp.ClientSession = None,
         webhook_id: str = None,
-        webhook_handlers: dict[Type[_WebHookEventType], WebHookHandler] = None,
+        webhook_handlers: WebHookHandlers = None,
     ):
         self.client_id = client_id
         self.__client_secret = client_secret

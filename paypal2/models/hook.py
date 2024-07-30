@@ -31,6 +31,8 @@ class WebHookSubscriptionResourceV2(BaseModel):
     # todo create_time
     # todo update_time
 
+    # fixme is custom_id here if it is set on subscription maybe? (if not it can be queried by the payments/details)
+
 
 class WebHookPlanResourceV2(BaseModel):
     id: str
