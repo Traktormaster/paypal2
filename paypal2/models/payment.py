@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional, Literal
 
 from pydantic import BaseModel, Field
@@ -17,10 +18,10 @@ class CapturedPayment(BaseModel):
     )
     links: list[HATEOASLink]
     amount: Optional[MonetaryValue] = None
+    create_time: Optional[datetime] = None
+    update_time: Optional[datetime] = None
     # todo network_transaction_reference
     # todo seller_protection
     # todo seller_receivable_breakdown
-    # todo create_time
-    # todo update_time
     # todo supplementary_data
     # todo payee

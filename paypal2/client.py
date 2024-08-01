@@ -4,8 +4,8 @@ import ssl
 import zlib
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone, timedelta
+from typing import Any
 from typing import Optional, Literal
-from typing import TypeVar, Awaitable, Any, Callable, Type
 
 import aiohttp
 import certifi
@@ -16,7 +16,6 @@ from aiohttp import TCPConnector
 from pydantic import BaseModel
 from ttldict2 import TTLDict
 
-from paypal2.models.hook import WebHookEvent
 from paypal2.models.order import OrderMinimalResponse
 from paypal2.models.order import OrdersCreate
 from paypal2.models.payment import CapturedPayment
@@ -55,11 +54,6 @@ class JsonBadRequest(aiohttp.ClientResponseError):
         self.data = data
 
 
-_WebHookEventType = TypeVar("_WebHookEventType", bound=WebHookEvent)
-WebHookHandler = Callable[[_WebHookEventType, dict[str, Any]], Awaitable[Any]]
-WebHookHandlers = dict[Type[_WebHookEventType], WebHookHandler]
-
-
 class PayPalApiClient:
     __slots__ = (
         "client_id",
@@ -69,7 +63,6 @@ class PayPalApiClient:
         "session",
         "session_owned",
         "webhook_id",
-        "webhook_handlers",
         "_access_token",
         "_cert_cache",
     )
@@ -91,7 +84,6 @@ class PayPalApiClient:
         proxy_address: str = None,
         session: aiohttp.ClientSession = None,
         webhook_id: str = None,
-        webhook_handlers: WebHookHandlers = None,
     ):
         self.client_id = client_id
         self.__client_secret = client_secret
@@ -100,7 +92,6 @@ class PayPalApiClient:
         self.session_owned = session is None
         self.session = session
         self.webhook_id = webhook_id
-        self.webhook_handlers = {e.HANDLER_KEY: (e, h) for e, h in (webhook_handlers or {}).items()}
         # state
         self._access_token = None
         self._cert_cache = TTLDict(14 * 24 * 60 * 60.0, max_items=10)
@@ -339,17 +330,3 @@ class PayPalApiClient:
         if not isinstance(data, dict):
             raise ValueError("Paypal webhook data is not dict")
         return data
-
-    async def process_webhook_notification(self, data: dict, **context):
-        """
-        Automatic WebHook (verified) data loading, handler selection and processing.
-        """
-        handler_key = (data.get("event_type"), data.get("resource_type"), data.get("resource_version", "1.0"))
-        event_handler = self.webhook_handlers.get(handler_key)
-        if not event_handler:
-            event_handler = self.webhook_handlers.get(None)  # try fallback if it is registered
-        if not event_handler:
-            return
-        event = event_handler[0].model_validate(data)
-        context["pp"] = self
-        return await event_handler[1](event, context)

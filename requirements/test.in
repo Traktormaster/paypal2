@@ -3,4 +3,5 @@ fastapi
 pytest
 pytest-asyncio
 pytest-httpserver
+pytest-order
 pytest-selenium

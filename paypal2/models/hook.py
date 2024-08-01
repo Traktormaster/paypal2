@@ -2,7 +2,7 @@ from typing import Optional, ClassVar
 
 from pydantic import BaseModel, Field
 
-from paypal2.models.common import HATEOASLink
+from paypal2.models.common import HATEOASLink, PlanBillingCycle, PlanPaymentPreferences, PlanTaxes
 
 
 class WebHookEvent(BaseModel):
@@ -42,9 +42,9 @@ class WebHookPlanResourceV2(BaseModel):
     description: Optional[str] = None
     usage_type: Optional[str] = None
     links: list[HATEOASLink]
-    # todo billing_cycles
-    # todo payment_preferences
-    # todo taxes
+    billing_cycles: Optional[list[PlanBillingCycle]] = None
+    payment_preferences: Optional[PlanPaymentPreferences] = None
+    taxes: Optional[PlanTaxes] = None
     # todo create_time
     # todo update_time
 

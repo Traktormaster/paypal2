@@ -1,20 +1,14 @@
 from typing import Optional
 
-from paypal2.client import PayPalApiClient, WebHookHandlers
+from paypal2.client import PayPalApiClient
 
 
 class PayPalDeps:
     PAYPAL: PayPalApiClient = None
 
     @classmethod
-    async def setup_paypal(
-        cls,
-        client_id: str,
-        client_secret: str,
-        webhook_id: Optional[str] = None,
-        webhook_handlers: Optional[WebHookHandlers] = None,
-    ):
-        pp = PayPalApiClient(client_id, client_secret, webhook_id=webhook_id, webhook_handlers=webhook_handlers)
+    async def setup_paypal(cls, client_id: str, client_secret: str, webhook_id: Optional[str] = None):
+        pp = PayPalApiClient(client_id, client_secret, webhook_id=webhook_id)
         await pp.setup()
         cls.PAYPAL = pp
         return pp

@@ -1,39 +1,8 @@
-from typing import Optional, Literal, Union, Any
+from typing import Optional, Literal
 
 from pydantic import BaseModel, Field
 
-from paypal2.models.common import MonetaryValue, HATEOASLink
-
-
-class PlanPaymentPreferences(BaseModel):
-    auto_bill_outstanding: Optional[bool] = True
-    setup_fee_failure_action: Optional[Literal["CONTINUE", "CANCEL"]] = "CANCEL"
-    payment_failure_threshold: Optional[int] = 0
-    setup_fee: MonetaryValue
-
-
-class PricingModel(BaseModel):
-    # todo pricing_model: Optional[Literal["VOLUME", "TIERED"]]
-    # todo tiers: Optional[list[TieredPricing]] = None
-    fixed_price: Optional[MonetaryValue] = None
-
-
-class Frequency(BaseModel):
-    interval_unit: Literal["DAY", "WEEK", "MONTH", "YEAR"]
-    interval_count: int = Field(ge=1, le=365, default=1)  # NOTE: maximum depends on interval_unit
-
-
-class BillingCycle(BaseModel):
-    tenure_type: Literal["REGULAR", "TRIAL"]
-    sequence: int = Field(ge=1, le=99)
-    total_cycles: int = Field(ge=0, le=999, default=1)  # 0 infinite
-    pricing_scheme: Optional[PricingModel]  # trial needs no pricing
-    frequency: Frequency
-
-
-class PlanTaxes(BaseModel):
-    inclusive: bool = True
-    percentage: str = Field(pattern=r"^((-?[0-9]+)|(-?([0-9]+)?[.][0-9]+))$")
+from paypal2.models.common import HATEOASLink, PlanBillingCycle, PlanPaymentPreferences, PlanTaxes
 
 
 class PlanMinimalResponse(BaseModel):
@@ -47,7 +16,7 @@ class _PlanCommon(BaseModel):
     name: str = Field(min_length=1, max_length=127)
     # TODO status
     description: Optional[str] = Field(min_length=1, max_length=127, default=None)
-    billing_cycles: Optional[list[BillingCycle]] = Field(min_length=1, max_length=12, default=None)
+    billing_cycles: Optional[list[PlanBillingCycle]] = Field(min_length=1, max_length=12, default=None)
     payment_preferences: Optional[PlanPaymentPreferences] = None
     taxes: Optional[PlanTaxes] = None
 

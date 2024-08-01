@@ -9,6 +9,7 @@ from pytest_httpserver import HTTPServer
 from selenium.webdriver.remote.webdriver import WebDriver
 from werkzeug import Request, Response
 
+from paypal2.hook import PayPalWebHookProcessorBase
 from paypal2_tests.const import (
     HOOK_CERTS,
     HOOK_SUBSCRIPTION_CREATED_v1,
@@ -25,10 +26,10 @@ from paypal2_tests.const import (
     HOOK_PLAN_CREATED_V1,
     HOOK_PLAN_UPDATED_V1,
 )
-from paypal2_tests.server.hooks import WEBHOOK_HANDLERS
 from paypal2_tests.utility import ServerProc
 
 
+@pytest.mark.order(10)
 @pytest.mark.asyncio
 async def test_paypal2_client(server_proc: ServerProc, selenium: WebDriver, httpserver: HTTPServer):
     async with aiohttp.ClientSession() as s:  # Wait for server startup.
@@ -101,7 +102,7 @@ async def _webhook_check(server_proc: ServerProc, httpserver: HTTPServer):
                 assert r.status == 200
             result = await _get_webhook_result()
             result_key = tuple(result["key"]) if result["key"] is not None else None
-            for event_cls in WEBHOOK_HANDLERS.keys():
+            for event_cls, _ in PayPalWebHookProcessorBase().webhook_handlers.values():
                 if event_cls.HANDLER_KEY == result_key:
                     event: BaseModel = event_cls.model_validate(json.loads(const_req.body))
                     assert result["event"] == event.model_dump()

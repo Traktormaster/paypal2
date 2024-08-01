@@ -1,5 +1,7 @@
 # paypal2
 
-Opinionated asyncio Paypal server-side integration SDK. 
+Opinionated asyncio Python server-side integration SDK for PayPal. 
 
-TODO
+# Status
+
+WIP
