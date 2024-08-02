@@ -14,6 +14,16 @@ class HATEOASLink(BaseModel):
     method: Optional[str] = None
 
 
+class RelatedIds(BaseModel):
+    order_id: Optional[str] = None
+    authorization_id: Optional[str] = None
+    capture_id: Optional[str] = None
+
+
+class PaymentSupplementaryData(BaseModel):
+    related_ids: Optional[RelatedIds] = None
+
+
 class PlanPaymentPreferences(BaseModel):
     auto_bill_outstanding: Optional[bool] = True
     setup_fee_failure_action: Optional[Literal["CONTINUE", "CANCEL"]] = "CANCEL"

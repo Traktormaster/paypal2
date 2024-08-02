@@ -14,12 +14,108 @@ HOOK_CERTS = {
     "https://api.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-1a5f47cb": b"-----BEGIN CERTIFICATE-----\r\nMIIHXDCCBkSgAwIBAgIQA/ujbySX3tuj46W/d7zhxDANBgkqhkiG9w0BAQsFADB1\r\nMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3\r\nd3cuZGlnaWNlcnQuY29tMTQwMgYDVQQDEytEaWdpQ2VydCBTSEEyIEV4dGVuZGVk\r\nIFZhbGlkYXRpb24gU2VydmVyIENBMB4XDTI0MDMwODAwMDAwMFoXDTI1MDMwNzIz\r\nNTk1OVowgdsxEzARBgsrBgEEAYI3PAIBAxMCVVMxGTAXBgsrBgEEAYI3PAIBAhMI\r\nRGVsYXdhcmUxHTAbBgNVBA8MFFByaXZhdGUgT3JnYW5pemF0aW9uMRAwDgYDVQQF\r\nEwczMDE0MjY3MQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTERMA8G\r\nA1UEBxMIU2FuIEpvc2UxFTATBgNVBAoTDFBheVBhbCwgSW5jLjEsMCoGA1UEAxMj\r\nbWVzc2FnZXZlcmlmaWNhdGlvbmNlcnRzLnBheXBhbC5jb20wggEiMA0GCSqGSIb3\r\nDQEBAQUAA4IBDwAwggEKAoIBAQC4GzoXbAbZY1nNrR6sr/WGBKHrv5MzXK+QY2lt\r\nN0eZFSMR3Q/FhTSVKyFGEtqpdkVu2RwnJnpz0dtDAnssBZTDE/3dafGT41cPPtjQ\r\nTx/VLhC0noV+SCcwYk2Bv7vm2RqeJUUVqThouNmZPaRZNpMPQDAqdHUoIxSk/kQl\r\nhPVHhTCpjY9wwUbwn49E/+f44W87kkeXsrbTet6bSeqgW1oy7sj2QR0vg2xi1yYy\r\ndNqhMhsceh3pV7qRfvlP7Rv3yorsCWZXAbxSB7MKzcSsnM2n4iE20pTWWiUaKLPI\r\nL4vTqfl0cqRygKx0Pcy4aknxIRwbI8Ab493j5c2Rmtxv4ZJhAgMBAAGjggN/MIID\r\nezAfBgNVHSMEGDAWgBQ901Cl1qCt7vNKYApl0yHU+PjWDzAdBgNVHQ4EFgQUGTJR\r\nHgzRoA4BYXr5GPWiwCf5gd8wLgYDVR0RBCcwJYIjbWVzc2FnZXZlcmlmaWNhdGlv\r\nbmNlcnRzLnBheXBhbC5jb20wSgYDVR0gBEMwQTALBglghkgBhv1sAgEwMgYFZ4EM\r\nAQEwKTAnBggrBgEFBQcCARYbaHR0cDovL3d3dy5kaWdpY2VydC5jb20vQ1BTMA4G\r\nA1UdDwEB/wQEAwIFoDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwdQYD\r\nVR0fBG4wbDA0oDKgMIYuaHR0cDovL2NybDMuZGlnaWNlcnQuY29tL3NoYTItZXYt\r\nc2VydmVyLWczLmNybDA0oDKgMIYuaHR0cDovL2NybDQuZGlnaWNlcnQuY29tL3No\r\nYTItZXYtc2VydmVyLWczLmNybDCBiAYIKwYBBQUHAQEEfDB6MCQGCCsGAQUFBzAB\r\nhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wUgYIKwYBBQUHMAKGRmh0dHA6Ly9j\r\nYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydFNIQTJFeHRlbmRlZFZhbGlkYXRp\r\nb25TZXJ2ZXJDQS5jcnQwDAYDVR0TAQH/BAIwADCCAXwGCisGAQQB1nkCBAIEggFs\r\nBIIBaAFmAHUATnWjJ1yaEMM4W2zU3z9S6x3w4I4bjWnAsfpksWKaOd8AAAGOHuxW\r\nNwAABAMARjBEAiA794gDwBlLuPrnv5Fj4ablrQ0rdN79WXYKElFRlZfFwQIgbSkU\r\n2m9OuKVbhYkYye2p7uEZaY+7CIau2CgGn021hb4AdgB9WR4S4XgqexxhZ3xe/fjQ\r\nh1wUoE6VnrkDL9kOjC55uAAAAY4e7FX0AAAEAwBHMEUCIH/TXkK2Wg7UAa1E0G0A\r\nBP2PZubHPXyzhtWUQWo0S7SyAiEAuKaUmmoOH7eS+cZXu18EwdU0b0/Fr4vTIeAW\r\ndBwuOOQAdQDm0jFjQHeMwRBBBtdxuc7B0kD2loSG+7qHMh39HjeOUAAAAY4e7FYQ\r\nAAAEAwBGMEQCIFsrE/dHNM1QbIclR/50AiCNtoKjcGJFoblgaVnWW/6uAiBA5EE+\r\nvX1dxUdluf6cktPuo0IxYZSd6WCG4zqBMR292TANBgkqhkiG9w0BAQsFAAOCAQEA\r\nvKdi82U0vGaCCAYN598wEN6Ktu+BeZp3W3p1iVRBZgY9l0JPjwWN8Apwm4BUUTp3\r\n00gpIfROKvyR1655B0QDv/oL1Wuz/zQ87kUGVZNNeac07+X2e6YP5sqrwF4ttWai\r\najFRa8M2Y6vEk+7EmSexynxJBRa86Aa4xogqlTv/7kXf7LrDzMTlfle7o2L7eqwd\r\nCIc7vCYw9XQ5K80d4Siy6xz+RSu7+Un8QlfAYB7z1o32uPEUihk05ulMiXJYvA0W\r\nOagItBsuMSzgwQ0KDC9EmDYmXE9xWtUolehmBGRyQw+/E7iVu4x4js1HRiD0M+s9\r\nbRQ14PLxRLqDKu8oqZ8DQA==\r\n-----END CERTIFICATE-----",
 }
 
-# TODO: These can be used to track single-step order checkouts as well. Maybe? docs not clear...
-# HOOK_PAYMENT_CAPTURE_PENDING = ConstRequestData()
-# HOOK_PAYMENT_CAPTURE_COMPLETED = ConstRequestData()
-# HOOK_PAYMENT_CAPTURE_REFUNDED = ConstRequestData()
-# HOOK_PAYMENT_CAPTURE_REVERSED = ConstRequestData()
-# HOOK_PAYMENT_CAPTURE_DECLINED = ConstRequestData()
+# These can be used to track single-step order checkouts.
+HOOK_PAYMENT_CAPTURE_PENDING_V2 = ConstRequestData(
+    body=b'{"id":"WH-9Y180613C5171350R-3A568107UP261041K","event_version":"1.0","create_time":"2018-08-15T20:03:06.086Z","resource_type":"capture","resource_version":"2.0","event_type":"PAYMENT.CAPTURE.PENDING","summary":"Payment pending for $ 2.51 USD","resource":{"id":"02T21492PP3782704","amount":{"currency_code":"USD","value":"2.51"},"final_capture":true,"seller_protection":{"status":"NOT_ELIGIBLE"},"status":"PENDING","status_details":{"reason":"UNILATERAL"},"create_time":"2018-08-15T20:02:40Z","update_time":"2018-08-15T20:02:40Z","links":[{"href":"https://api.paypal.com/v2/payments/captures/02T21492PP3782704","rel":"self","method":"GET"},{"href":"https://api.paypal.com/v2/payments/captures/02T21492PP3782704/refund","rel":"refund","method":"POST"},{"href":"https://api.paypal.com/v2/checkout/orders/8PR65097T8571330M","rel":"up","method":"GET"}]},"links":[{"href":"https://api.paypal.com/v1/notifications/webhooks-events/WH-9Y180613C5171350R-3A568107UP261041K","rel":"self","method":"GET"},{"href":"https://api.paypal.com/v1/notifications/webhooks-events/WH-9Y180613C5171350R-3A568107UP261041K/resend","rel":"resend","method":"POST"}]}',
+    headers={
+        "x-real-ip": "173.0.81.140",
+        "host": "127.0.0.1:8001",
+        "connection": "close",
+        "content-length": "1137",
+        "accept": "*/*",
+        "paypal-transmission-id": "4cce5920-5106-11ef-84e2-f38df3f70683",
+        "paypal-transmission-time": "2024-08-02T19:34:57Z",
+        "paypal-transmission-sig": "Kg+nPYIGXGAVA5sELwiLBTVZwzwssEAt/DI3/xDsjzwd1OMvddW2tFSpx4twvxEZS32fGVxZ4XRMWaMXYSBlFC09RpYNbA16r/WP8YV3KjaSzAc+btQyfUSRypr1mUsuWRL0DJnkLoC/KhCa4m3ZKFD4bFo5ZlWzdG2u5QgzL+YC/YmAhJGtcv6CIEN1rWB5OWuupVLhb+qYjhUH+99xsc5U2CihB65HFbtQqagX7YNFtOxEF5ckqSdgAYoMPECBCX8zOrDMy2UUaIvQpyhm0G3MF/IG3IPnRgP+ycN+AOjdsBGAWWwtZoXTPQ0mKH7oop4OrMNy4BPfE/8agUDxkw==",
+        "paypal-auth-version": "v2",
+        "paypal-cert-url": "https://api.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-1a5f47cb",
+        "paypal-auth-algo": "SHA256withRSA",
+        "content-type": "application/json",
+        "user-agent": "PayPal/AUHD-214.0-58391792",
+        "correlation-id": "1e7e973360d91",
+        "x-b3-spanid": "c9e93947b749c4de",
+    },
+)
+HOOK_PAYMENT_CAPTURE_COMPLETED_V2 = ConstRequestData(
+    body=b'{"id":"WH-58D329510W468432D-8HN650336L201105X","event_version":"1.0","create_time":"2019-02-14T21:50:07.940Z","resource_type":"capture","resource_version":"2.0","event_type":"PAYMENT.CAPTURE.COMPLETED","summary":"Payment completed for $ 30.0 USD","resource":{"id":"12A34567BC123456S","amount":{"currency_code":"USD","value":"30.00"},"final_capture":true,"seller_protection":{"status":"ELIGIBLE","dispute_categories":["ITEM_NOT_RECEIVED","UNAUTHORIZED_TRANSACTION"]},"disbursement_mode":"INSTANT","seller_receivable_breakdown":{"gross_amount":{"currency_code":"USD","value":"30.00"},"paypal_fee":{"currency_code":"USD","value":"1.54"},"platform_fees":[{"amount":{"currency_code":"USD","value":"2.00"},"payee":{"merchant_id":"ABCDEFGHIJKL1"}}],"net_amount":{"currency_code":"USD","value":"26.46"}},"invoice_id":"5840243-146","status":"COMPLETED","supplementary_data":{"related_ids":{"order_id":"1AB234567A1234567"}},"create_time":"2022-08-23T18:29:50Z","update_time":"2022-08-23T18:29:50Z","links":[{"href":"https://api.paypal.com/v2/payments/captures/12A34567BC123456S","rel":"self","method":"GET"},{"href":"https://api.paypal.com/v2/payments/captures/12A34567BC123456S/refund","rel":"refund","method":"POST"},{"href":"https://api.paypal.com/v2/checkout/orders/1AB234567A1234567","rel":"up","method":"GET"}]},"links":[{"href":"https://api.paypal.com/v1/notifications/webhooks-events/WH-58D329510W468432D-8HN650336L201105X","rel":"self","method":"GET"},{"href":"https://api.paypal.com/v1/notifications/webhooks-events/WH-58D329510W468432D-8HN650336L201105X/resend","rel":"resend","method":"POST"}]}',
+    headers={
+        "x-real-ip": "173.0.81.65",
+        "host": "127.0.0.1:8001",
+        "connection": "close",
+        "content-length": "1596",
+        "accept": "*/*",
+        "paypal-transmission-id": "1c6772d0-5106-11ef-9b66-89f3f924d48a",
+        "paypal-transmission-time": "2024-08-02T19:33:35Z",
+        "paypal-transmission-sig": "KY8qkrrIcGAyKS4VNgYlgP0iWIgeFEa3Y4q14d7mStEdJQbiEMhyB9/2cR85tjTlAmJ4NFxBW3BFdrFn7EukmdSw2RFkaCfSmzZoq8Uzjp1y6h9Uo307qte0hkuDHLLW07EvflOfS0Q2mNd+WPsmCilVYRAw9Acv6O8qVHAdVjINRoSeS5vISIDN7vaj0rBValwU8GE36rfFpUz1BvJqY2JaZc7wL0UYYB+xLneQWdOy4woa8MWUGVqFkJ9h/RLZsAIoMlOikAljETFIdGKiNr23GILoa1yM8/y+Oi1KM2DOJlEeywiR0BU5bhPjIsy8gsdwTyadbF1BCkFJcyGIlg==",
+        "paypal-auth-version": "v2",
+        "paypal-cert-url": "https://api.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-1a5f47cb",
+        "paypal-auth-algo": "SHA256withRSA",
+        "content-type": "application/json",
+        "user-agent": "PayPal/AUHD-214.0-58391792",
+        "correlation-id": "8622432c697e5",
+        "x-b3-spanid": "6cc9dda341a8eada",
+    },
+)
+HOOK_PAYMENT_CAPTURE_REFUNDED_V2 = ConstRequestData(
+    body=b'{"id":"WH-1GE84257G0350133W-6RW800890C634293G","event_version":"1.0","create_time":"2018-08-15T19:14:04.543Z","resource_type":"refund","resource_version":"2.0","event_type":"PAYMENT.CAPTURE.REFUNDED","summary":"A $ 0.99 USD capture payment was refunded","resource":{"id":"1Y107995YT783435V","amount":{"currency_code":"USD","value":"0.99"},"seller_payable_breakdown":{"gross_amount":{"currency_code":"USD","value":"0.99"},"paypal_fee":{"currency_code":"USD","value":"0.02"},"net_amount":{"currency_code":"USD","value":"0.97"},"total_refunded_amount":{"currency_code":"USD","value":"1.98"}},"status":"COMPLETED","create_time":"2018-08-15T12:13:29-07:00","update_time":"2018-08-15T12:13:29-07:00","links":[{"href":"https://api.paypal.com/v2/payments/refunds/1Y107995YT783435V","rel":"self","method":"GET"},{"href":"https://api.paypal.com/v2/payments/captures/0JF852973C016714D","rel":"up","method":"GET"}]},"links":[{"href":"https://api.paypal.com/v1/notifications/webhooks-events/WH-1GE84257G0350133W-6RW800890C634293G","rel":"self","method":"GET"},{"href":"https://api.paypal.com/v1/notifications/webhooks-events/WH-1GE84257G0350133W-6RW800890C634293G/resend","rel":"resend","method":"POST"}]}',
+    headers={
+        "x-real-ip": "173.0.81.65",
+        "host": "127.0.0.1:8001",
+        "connection": "close",
+        "content-length": "1192",
+        "accept": "*/*",
+        "paypal-transmission-id": "51730200-5106-11ef-9a30-157053fd3e43",
+        "paypal-transmission-time": "2024-08-02T19:35:04Z",
+        "paypal-transmission-sig": "ff31fhZxoix1VbYc2wPp991eiUBdhALb71NFSq8VOMkbaBdx3Gm4lFZmQDL/lUXl4rImLjUdDvBMp4DOCN7T5WmyY7G88yzMJJCngENSA7+r1NXweP+TLy5/jyGoNU2j3VEUSr9gwNF1tKrCpixnJbzwTA7tI8s4c53xfdtPuYKd4KNjH7jRQXt/YH+sR9hwNZTPWpIUm1LrdGFxCH1iHoM5/mO1E7EngRuTf8zYAFIJE/vBcY2dLoD2gTJPfLbo5D+KSSMqgrD+xuCPJtZnQjP9QbA0rUAenRYAbRxPh2u3dLTiAaRMP7mZBI4d9ecPkdk0HgtUAPVhJTTBmx+Lag==",
+        "paypal-auth-version": "v2",
+        "paypal-cert-url": "https://api.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-1a5f47cb",
+        "paypal-auth-algo": "SHA256withRSA",
+        "content-type": "application/json",
+        "user-agent": "PayPal/AUHD-214.0-58391792",
+        "correlation-id": "34da5ac816797",
+        "x-b3-spanid": "2d01b91b31fa9b6c",
+    },
+)
+HOOK_PAYMENT_CAPTURE_REVERSED_V2 = ConstRequestData(
+    body=b'{"id":"WH-6F207351SC284371F-0KX52201050121307","event_version":"1.0","create_time":"2018-08-15T21:30:35.780Z","resource_type":"refund","resource_version":"2.0","event_type":"PAYMENT.CAPTURE.REVERSED","summary":"A $ 2.51 USD capture payment was reversed","resource":{"id":"09E71677NS257044M","amount":{"currency_code":"USD","value":"2.51"},"note_to_payer":"Payment reversed","seller_payable_breakdown":{"gross_amount":{"currency_code":"USD","value":"2.51"},"paypal_fee":{"currency_code":"USD","value":"0.00"},"net_amount":{"currency_code":"USD","value":"2.51"},"total_refunded_amount":{"currency_code":"USD","value":"2.51"}},"status":"COMPLETED","create_time":"2018-08-15T14:30:10-07:00","update_time":"2018-08-15T14:30:10-07:00","links":[{"href":"https://api.paypal.com/v2/payments/refunds/09E71677NS257044M","rel":"self","method":"GET"},{"href":"https://api.paypal.com/v2/payments/captures/4L335234718889942","rel":"up","method":"GET"}]},"links":[{"href":"https://api.paypal.com/v1/notifications/webhooks-events/WH-6F207351SC284371F-0KX52201050121307","rel":"self","method":"GET"},{"href":"https://api.paypal.com/v1/notifications/webhooks-events/WH-6F207351SC284371F-0KX52201050121307/resend","rel":"resend","method":"POST"}]}',
+    headers={
+        "x-real-ip": "173.0.81.140",
+        "host": "127.0.0.1:8001",
+        "connection": "close",
+        "content-length": "1227",
+        "accept": "*/*",
+        "paypal-transmission-id": "55266d10-5106-11ef-9a30-157053fd3e43",
+        "paypal-transmission-time": "2024-08-02T19:35:11Z",
+        "paypal-transmission-sig": "aViMsu1a/dLFH1RdcaSCsRchGLui3tLMvFwEx8W9D0FgG0hYt+yKUHjTjtLrHKXChwx5K0+Ad0gtMywRgW0DhEKcEwry34T9rrPDxsdYKT88g2MwnhEsAl7bDFwfiwbM9lg7YMJcGukXisZTNga5IJx/ywbmhgVXmdgUhjJQevDsStBL79ZpzLsdlMmfufIyddrDmpUvIXFH10vspzSiaIlQH2xg7K1FI5FDa+Y0eAjmD245YHIhob7kZUOK70EVZPtF9n6fYQ5wZwfg/H6nd1NVSGlBjiTqvSY9hV8d2xbTmFaSPKObHUwxAA+4lGtcrKnlXqG57+B2R+SS8vnYGA==",
+        "paypal-auth-version": "v2",
+        "paypal-cert-url": "https://api.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-1a5f47cb",
+        "paypal-auth-algo": "SHA256withRSA",
+        "content-type": "application/json",
+        "user-agent": "PayPal/AUHD-214.0-58391792",
+        "correlation-id": "acdd2a0536b10",
+        "x-b3-spanid": "5ae6310c43c5d7d7",
+    },
+)
+HOOK_PAYMENT_CAPTURE_DECLINED_V2 = ConstRequestData(
+    body=b'{"id":"WH-6HE329230C693231F-5WV60586YA659351G","event_version":"1.0","create_time":"2022-12-13T19:13:07.251Z","resource_type":"capture","resource_version":"2.0","event_type":"PAYMENT.CAPTURE.DECLINED","summary":"A payment capture for $ 185.1 USD was declined.","resource":{"id":"7U133281TB3277326","amount":{"currency_code":"USD","value":"185.10"},"final_capture":false,"seller_protection":{"status":"ELIGIBLE","dispute_categories":["ITEM_NOT_RECEIVED","UNAUTHORIZED_TRANSACTION"]},"disbursement_mode":"INSTANT","seller_receivable_breakdown":{"gross_amount":{"currency_code":"USD","value":"185.10"},"platform_fees":[{"amount":{"currency_code":"USD","value":"0.50"},"payee":{"merchant_id":"QG3ECYYLJ2A48"}}],"net_amount":{"currency_code":"USD","value":"184.60"},"receivable_amount":{"currency_code":"EUR","value":"115.98"},"exchange_rate":{"source_currency":"USD","target_currency":"EUR","value":"0.628281035098039"}},"invoice_id":"ARG0-2022-12-08T21:00:21.564Z-435","custom_id":"CUSTOMID-1001","status":"DECLINED","supplementary_data":{"related_ids":{"order_id":"48R416400V564864N","authorization_id":"24B76447NN600461P"}},"create_time":"2022-12-13T19:13:00Z","update_time":"2022-12-13T19:13:00Z","links":[{"href":"https://api.paypal.com/v2/payments/captures/7U133281TB3277326","rel":"self","method":"GET"},{"href":"https://api.paypal.com/v2/payments/captures/7U133281TB3277326/refund","rel":"refund","method":"POST"},{"href":"https://api.paypal.com/v2/payments/authorizations/24B76447NN600461P","rel":"up","method":"GET"}]},"links":[{"href":"https://api.paypal.com/v1/notifications/webhooks-events/WH-6HE329230C693231F-5WV60586YA659351G","rel":"self","method":"GET"},{"href":"https://api.paypal.com/v1/notifications/webhooks-events/WH-6HE329230C693231F-5WV60586YA659351G/resend","rel":"resend","method":"POST"}]}',
+    headers={
+        "x-real-ip": "173.0.81.65",
+        "host": "127.0.0.1:8001",
+        "connection": "close",
+        "content-length": "1813",
+        "accept": "*/*",
+        "paypal-transmission-id": "3ed00ad0-5106-11ef-811d-8beb274ff66b",
+        "paypal-transmission-time": "2024-08-02T19:34:33Z",
+        "paypal-transmission-sig": "O3XQypYDh/gSvvIE2Mj7H+hbcoD3T7OZwWYgiZ10DQxpyF3KK2DiiVJiNwagSC/ah5yYb8XkYMkFLLQxm/wzH7zJPP9HV7nfDyc5gDO2gINgu3hAnxyNDHJBvNWIyLTTsK3KDc7zi3E1KRv74XSbsfAYIaULntjGn2EMEjG+TCfHof7a/AUMX5I5KdLVK7QCt5OorvxGm0ermOXR778bN+/jyQ2R7EuNJuB0GDwsja3UHMI80v7OexDaHeRb4NAecvLP6xaFoKWErFUyGkcwkFoAwaGuM7sGByJuBPfqXgtLsBR8+4bWsNZJsQjZEwxMhLw3puw/M01vpGfpUvknAg==",
+        "paypal-auth-version": "v2",
+        "paypal-cert-url": "https://api.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-1a5f47cb",
+        "paypal-auth-algo": "SHA256withRSA",
+        "content-type": "application/json",
+        "user-agent": "PayPal/AUHD-214.0-58391792",
+        "correlation-id": "7647eb4b4c677",
+        "x-b3-spanid": "31c39634469dd9a1",
+    },
+)
+# NOTE: HOOK_PAYMENT_CAPTURE_DENIED_V2 is not relevant to the v2 payments/orders API seemingly.
 
 # These can be used to track subscription state for an account.
 HOOK_SUBSCRIPTION_CREATED_v2 = ConstRequestData(

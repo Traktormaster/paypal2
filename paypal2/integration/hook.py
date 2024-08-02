@@ -4,6 +4,8 @@ from paypal2.client import PayPalApiClient
 from paypal2.hook import PayPalWebHookProcessorBase
 from paypal2.models.common import PlanBillingCycle
 from paypal2.models.hook import (
+    WebHookEventCaptureReversed,
+    WebHookEventCaptureRefunded,
     WebHookEventSubscriptionCreated,
     WebHookEventSubscriptionExpired,
     WebHookEventSubscriptionCancelled,
@@ -42,6 +44,15 @@ class AbstractPayPalWebHookProcessor(PayPalWebHookProcessorBase):
         captured_payment = await self.pp.captured_payment_details(resource.id)
         if captured_payment and captured_payment.custom_id:
             return captured_payment
+
+    # async def event_capture_completed(self, event: WebHookEventCaptureCompleted) -> Any:
+    #     pass
+
+    async def event_capture_reversed(self, event: WebHookEventCaptureReversed) -> Any:
+        return await self._revoke_order(event)
+
+    async def event_capture_refunded(self, event: WebHookEventCaptureRefunded) -> Any:
+        return await self._revoke_order(event)
 
     async def event_subscription_created(self, event: WebHookEventSubscriptionCreated) -> Any:
         if event.resource.custom_id:
@@ -87,6 +98,12 @@ class AbstractPayPalWebHookProcessor(PayPalWebHookProcessorBase):
 
     # async def event_fallback(self, event: WebHookEvent) -> Any:
     #     pass
+
+    async def _revoke_order(self, event: WebHookEventCaptureReversed | WebHookEventCaptureRefunded) -> Any:
+        """
+        Revoke the ordered service denoted by the id of the payment.
+        """
+        raise NotImplementedError()
 
     async def _associate_subscription(self, event: WebHookEventSubscriptionCreated) -> Any:
         """

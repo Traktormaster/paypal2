@@ -2,6 +2,9 @@ from typing import TypeVar, Any, Awaitable, Callable, Type
 
 from paypal2.models.hook import (
     WebHookEvent,
+    WebHookEventCaptureCompleted,
+    WebHookEventCaptureReversed,
+    WebHookEventCaptureRefunded,
     WebHookEventSubscriptionCreated,
     WebHookEventSubscriptionExpired,
     WebHookEventSubscriptionCancelled,
@@ -33,6 +36,9 @@ class PayPalWebHookProcessorBase:
         Override this method to remove or extend the used handlers.
         """
         return {
+            WebHookEventCaptureCompleted: self.event_capture_completed,
+            WebHookEventCaptureReversed: self.event_capture_reversed,
+            WebHookEventCaptureRefunded: self.event_capture_refunded,
             WebHookEventSubscriptionCreated: self.event_subscription_created,
             WebHookEventSubscriptionExpired: self.event_subscription_expired,
             WebHookEventSubscriptionCancelled: self.event_subscription_cancelled,
@@ -58,32 +64,74 @@ class PayPalWebHookProcessorBase:
         event = event_handler[0].model_validate(data)
         return await event_handler[1](event)
 
+    async def event_capture_completed(self, event: WebHookEventCaptureCompleted) -> Any:
+        """
+        This is mostly informational, as the capturing of the order (unless you use intent: AUTHORIZE) is
+        done by direct API call.
+        """
+
+    async def event_capture_reversed(self, event: WebHookEventCaptureReversed) -> Any:
+        """
+        The server shall revoke the granted resource by the id of the capture or record it as denied for reference.
+        """
+
+    async def event_capture_refunded(self, event: WebHookEventCaptureRefunded) -> Any:
+        """
+        The server shall revoke the granted resource by the id of the capture or record it as denied for reference.
+        """
+
     async def event_subscription_created(self, event: WebHookEventSubscriptionCreated) -> Any:
-        pass
+        """
+        Record the subscription to the relevant party if tracking is desired for information or performing actions
+        like suspend or continue for example.
+        """
 
     async def event_subscription_expired(self, event: WebHookEventSubscriptionExpired) -> Any:
-        pass
+        """
+        Remove the subscription from the relevant party if it is tracked, because it is no longer valid.
+        """
 
     async def event_subscription_cancelled(self, event: WebHookEventSubscriptionCancelled) -> Any:
-        pass
+        """
+        Remove the subscription from the relevant party if it is tracked, because it is no longer valid.
+        """
 
     async def event_subscription_payment_failed(self, event: WebHookEventSubscriptionPaymentFailed) -> Any:
-        pass
+        """
+        A payment was not successfully charged. This is mostly informational, the relevant party should be notified.
+        The subscription may still be active or may have got suspended based on the payment_preferences of the plan.
+        NOTE: It is not clear if failure of charging the setup_fee would trigger this event, but depending on
+        the payment_preferences, the subscription could also be cancelled here.
+        """
 
     async def event_sale_completed(self, event: WebHookEventSaleCompleted) -> Any:
-        pass
+        """
+        A subscription payment has been successfully charged, grant the service/resource to the relevant party.
+        """
 
     async def event_sale_reversed(self, event: WebHookEventSaleReversed) -> Any:
-        pass
+        """
+        The server shall revoke the granted resource by the id of the sale or record it as denied for reference.
+        """
 
     async def event_sale_refunded(self, event: WebHookEventSaleRefunded) -> Any:
-        pass
+        """
+        The server shall revoke the granted resource by the id of the sale or record it as denied for reference.
+        """
 
     async def event_plan_created(self, event: WebHookEventPlanCreated) -> Any:
-        pass
+        """
+        The server can track the details of specific plans that are relevant for its users. This is beneficial,
+        as the products and plans are primarily managed on the PayPal server/UI.
+        """
 
     async def event_plan_updated(self, event: WebHookEventPlanUpdated) -> Any:
-        pass
+        """
+        The server can track the details of specific plans that are relevant for its users. This is beneficial,
+        as the products and plans are primarily managed on the PayPal server/UI.
+        """
 
     async def event_fallback(self, event: WebHookEvent) -> Any:
-        pass
+        """
+        Any event not captured by specific handlers may be processed here for introspection for example.
+        """

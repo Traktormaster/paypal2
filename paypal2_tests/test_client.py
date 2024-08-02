@@ -12,6 +12,11 @@ from werkzeug import Request, Response
 from paypal2.hook import PayPalWebHookProcessorBase
 from paypal2_tests.const import (
     HOOK_CERTS,
+    HOOK_PAYMENT_CAPTURE_PENDING_V2,
+    HOOK_PAYMENT_CAPTURE_COMPLETED_V2,
+    HOOK_PAYMENT_CAPTURE_REFUNDED_V2,
+    HOOK_PAYMENT_CAPTURE_REVERSED_V2,
+    HOOK_PAYMENT_CAPTURE_DECLINED_V2,
     HOOK_SUBSCRIPTION_CREATED_v1,
     HOOK_SUBSCRIPTION_CREATED_v2,
     HOOK_PAYMENT_SALE_COMPLETED,
@@ -81,6 +86,11 @@ async def _webhook_check(server_proc: ServerProc, httpserver: HTTPServer):
 
         await _get_webhook_result(ignore=True)  # clear remaining if any
         for const_req in [
+            HOOK_PAYMENT_CAPTURE_PENDING_V2,
+            HOOK_PAYMENT_CAPTURE_COMPLETED_V2,
+            HOOK_PAYMENT_CAPTURE_REFUNDED_V2,
+            HOOK_PAYMENT_CAPTURE_REVERSED_V2,
+            HOOK_PAYMENT_CAPTURE_DECLINED_V2,
             HOOK_SUBSCRIPTION_CREATED_v2,
             HOOK_SUBSCRIPTION_EXPIRED_V2,
             HOOK_SUBSCRIPTION_CANCELLED_V2,
@@ -105,7 +115,7 @@ async def _webhook_check(server_proc: ServerProc, httpserver: HTTPServer):
             for event_cls, _ in PayPalWebHookProcessorBase().webhook_handlers.values():
                 if event_cls.HANDLER_KEY == result_key:
                     event: BaseModel = event_cls.model_validate(json.loads(const_req.body))
-                    assert result["event"] == event.model_dump()
+                    assert result["event"] == event.model_dump(mode="json")
                     break
             else:
                 assert False, f"webhook handler not for {result_key}"

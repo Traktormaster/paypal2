@@ -3,7 +3,8 @@ from typing import Optional, ClassVar
 
 from pydantic import BaseModel, Field
 
-from paypal2.models.common import HATEOASLink, PlanBillingCycle, PlanPaymentPreferences, PlanTaxes
+from paypal2.models.common import HATEOASLink, PlanBillingCycle, PlanPaymentPreferences, PlanTaxes, MonetaryValue, \
+    PaymentSupplementaryData
 
 
 class WebHookEvent(BaseModel):
@@ -15,6 +16,20 @@ class WebHookEvent(BaseModel):
     resource_version: Optional[str] = None
     resource: dict
     links: list[HATEOASLink]
+
+
+class WebHookCaptureResourceV2(BaseModel):
+    id: str
+    status: str
+    amount: Optional[MonetaryValue] = None
+    supplementary_data: Optional[PaymentSupplementaryData] = None
+    create_time: Optional[datetime] = None
+    update_time: Optional[datetime] = None
+    links: list[HATEOASLink]
+    # todo seller_protection
+    # todo seller_receivable_breakdown
+    # todo payee
+    # todo final_capture
 
 
 class WebHookSubscriptionResourceV2(BaseModel):
@@ -74,6 +89,21 @@ class WebHookSaleResource(BaseModel):
     # processing of the integration layer does not utilize this, but queries the related captured-payment details which
     # has an official "custom_id" field.
     custom: Optional[str] = None
+
+
+class WebHookEventCaptureCompleted(WebHookEvent):
+    HANDLER_KEY: ClassVar = ("PAYMENT.CAPTURE.COMPLETED", "capture", "2.0")
+    resource: WebHookCaptureResourceV2
+
+
+class WebHookEventCaptureReversed(WebHookEvent):
+    HANDLER_KEY: ClassVar = ("PAYMENT.CAPTURE.REVERSED", "capture", "2.0")
+    resource: WebHookCaptureResourceV2
+
+
+class WebHookEventCaptureRefunded(WebHookEvent):
+    HANDLER_KEY: ClassVar = ("PAYMENT.CAPTURE.REFUNDED", "capture", "2.0")
+    resource: WebHookCaptureResourceV2
 
 
 class WebHookEventSubscriptionCreated(WebHookEvent):
