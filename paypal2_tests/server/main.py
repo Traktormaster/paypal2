@@ -33,13 +33,18 @@ async def lifespan(app: FastAPI):
         await GlobalDeps.close()
 
 
-app = FastAPI(title="Testing server for paypal2 lib", lifespan=lifespan)
+app = FastAPI(
+    title="Testing server for paypal2 lib",
+    lifespan=lifespan,
+    root_path=os.environ.get("PAYPAL2_TESTING_SERVER_ROOT_PATH", ""),
+)
 
 
 @app.get("/")
 async def root(pp: PayPalDep):
     return HTMLResponse(
-        (RESOURCES_PATH / "index.html").read_text() % {"client_id": pp.client_id, "plan_id": GlobalDeps.PLAN_ID}
+        (RESOURCES_PATH / "index.html").read_text()
+        % {"client_id": pp.client_id, "plan_id": GlobalDeps.PLAN_ID, "root_path": repr(app.root_path)}
     )
 
 

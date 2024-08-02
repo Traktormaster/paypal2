@@ -17,7 +17,7 @@ const order_options = {
     } ,
     async createOrder() {
       try {
-        const response = await fetch("/api/order-create", {
+        const response = await fetch(`${rootPath}/api/order-create`, {
           method: "POST",
           headers: {"Content-Type": "application/json"},
           body: JSON.stringify({id: "some-digital-good"}),
@@ -41,7 +41,7 @@ const order_options = {
     } ,
     async onApprove(data, actions) {
       try {
-        const response = await fetch(`/api/order-capture/${data.orderID}`, {
+        const response = await fetch(`${rootPath}/api/order-capture/${data.orderID}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -126,7 +126,7 @@ setup_sub();
 
 // payment details
 document.getElementById("payment-id-btn").onclick = function(){
-    fetch(`/api/payment/${document.getElementById("payment-id").value}`, {
+    fetch(`${rootPath}/api/payment/${document.getElementById("payment-id").value}`, {
           method: "POST",
           headers: {},
         }).then(function(response) {
@@ -136,7 +136,7 @@ document.getElementById("payment-id-btn").onclick = function(){
 
 // subscription details
 document.getElementById("subdet-id-btn1").onclick = function(){
-    fetch(`/api/subscription/${document.getElementById("subdet-id").value}`, {
+    fetch(`${rootPath}/api/subscription/${document.getElementById("subdet-id").value}`, {
           method: "POST",
           headers: {},
         }).then(function(response) {
@@ -145,7 +145,7 @@ document.getElementById("subdet-id-btn1").onclick = function(){
 };
 
 document.getElementById("subdet-id-btn2").onclick = function(){
-    fetch(`/api/subscription-tx/${document.getElementById("subdet-id").value}`, {
+    fetch(`${rootPath}/api/subscription-tx/${document.getElementById("subdet-id").value}`, {
           method: "POST",
           headers: {},
         }).then(function(response) {

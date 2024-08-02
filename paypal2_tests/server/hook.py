@@ -30,7 +30,14 @@ class DebugPayPalWebHookProcessor(AbstractPayPalWebHookProcessor):
     async def _associate_subscription(
         self, event: WebHookEventSubscriptionCreated, payment_details: CapturedPayment
     ) -> Any:
-        self.whr.append({"key": event.HANDLER_KEY, "event": event.model_dump()})
+        self.whr.append(
+            {
+                "handle": "associate_subscription",
+                "key": event.HANDLER_KEY,
+                "event": event.model_dump(),
+                "payment_details": payment_details.model_dump(),
+            }
+        )
         return self.whr[-1]
 
     async def _dissociate_subscription(
@@ -38,33 +45,68 @@ class DebugPayPalWebHookProcessor(AbstractPayPalWebHookProcessor):
         event: WebHookEventSubscriptionExpired | WebHookEventSubscriptionCancelled,
         payment_details: CapturedPayment,
     ) -> Any:
-        self.whr.append({"key": event.HANDLER_KEY, "event": event.model_dump()})
+        self.whr.append(
+            {
+                "handle": "dissociate_subscription",
+                "key": event.HANDLER_KEY,
+                "event": event.model_dump(),
+                "payment_details": payment_details.model_dump(),
+            }
+        )
         return self.whr[-1]
 
     async def _warn_subscription_failure(
         self, event: WebHookEventSubscriptionPaymentFailed, payment_details: CapturedPayment
     ) -> Any:
-        self.whr.append({"key": event.HANDLER_KEY, "event": event.model_dump()})
+        self.whr.append(
+            {
+                "handle": "warn_subscription_failure",
+                "key": event.HANDLER_KEY,
+                "event": event.model_dump(),
+                "payment_details": payment_details.model_dump(),
+            }
+        )
         return self.whr[-1]
 
     async def _grant_subscription(self, event: WebHookEventSaleCompleted, payment_details: CapturedPayment) -> Any:
-        self.whr.append({"key": event.HANDLER_KEY, "event": event.model_dump()})
+        self.whr.append(
+            {
+                "handle": "grant_subscription",
+                "key": event.HANDLER_KEY,
+                "event": event.model_dump(),
+                "payment_details": payment_details.model_dump(),
+            }
+        )
         return self.whr[-1]
 
     async def _revoke_subscription(
         self, event: WebHookEventSaleReversed | WebHookEventSaleRefunded, payment_details: CapturedPayment
     ) -> Any:
-        self.whr.append({"key": event.HANDLER_KEY, "event": event.model_dump()})
+        self.whr.append(
+            {
+                "handle": "revoke_subscription",
+                "key": event.HANDLER_KEY,
+                "event": event.model_dump(),
+                "payment_details": payment_details.model_dump(),
+            }
+        )
         return self.whr[-1]
 
     async def _track_plan_pricing(
         self, event: WebHookEventPlanCreated | WebHookEventPlanUpdated, billing_cycle: PlanBillingCycle
     ) -> Any:
-        self.whr.append({"key": event.HANDLER_KEY, "event": event.model_dump()})
+        self.whr.append(
+            {
+                "handle": "track_plan_pricing",
+                "key": event.HANDLER_KEY,
+                "event": event.model_dump(),
+                "billing_cycle": billing_cycle.model_dump(),
+            }
+        )
         return self.whr[-1]
 
     async def event_fallback(self, event: WebHookEvent) -> Any:
-        self.whr.append({"key": event.HANDLER_KEY, "event": event.model_dump()})
+        self.whr.append({"handle": "event_fallback", "key": event.HANDLER_KEY, "event": event.model_dump()})
         return self.whr[-1]
 
 
