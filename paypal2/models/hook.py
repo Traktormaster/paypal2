@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional, ClassVar
 
 from pydantic import BaseModel, Field
@@ -24,14 +25,13 @@ class WebHookSubscriptionResourceV2(BaseModel):
     start_time: Optional[str] = None
     auto_renewal: Optional[bool] = None
     links: list[HATEOASLink]
+    custom_id: Optional[str] = None
+    create_time: Optional[datetime] = None
     # todo quantity
     # todo shipping_amount
     # todo subscriber
     # todo billing_info
-    # todo create_time
     # todo update_time
-
-    # fixme is custom_id here if it is set on subscription maybe? (if not it can be queried by the payments/details)
 
 
 class WebHookPlanResourceV2(BaseModel):

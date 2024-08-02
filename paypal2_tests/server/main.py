@@ -95,6 +95,7 @@ async def api_order_capture(pp: PayPalDep, order_id: str):
 @app.post("/api/hook")
 async def api_hook(pp: PayPalDep, whr: WebHookResults, request: Request):
     data = await pp.verify_webhook_notification(await request.body(), request.headers)
+    print("_WEBHOOK_DATA", data)
     if os.environ.get("PAYPAL2_TESTING_WEBHOOK_PROCESSOR") == "ABSTRACT":
         processor = DebugPayPalWebHookProcessor(pp, whr)  # does not work with simulated notifications
     else:

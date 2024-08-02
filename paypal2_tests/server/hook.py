@@ -27,45 +27,18 @@ class DebugPayPalWebHookProcessor(AbstractPayPalWebHookProcessor):
         AbstractPayPalWebHookProcessor.__init__(self, pp)
         self.whr = whr
 
-    async def _associate_subscription(
-        self, event: WebHookEventSubscriptionCreated, payment_details: CapturedPayment
-    ) -> Any:
-        self.whr.append(
-            {
-                "handle": "associate_subscription",
-                "key": event.HANDLER_KEY,
-                "event": event.model_dump(),
-                "payment_details": payment_details.model_dump(),
-            }
-        )
+    async def _associate_subscription(self, event: WebHookEventSubscriptionCreated) -> Any:
+        self.whr.append({"handle": "associate_subscription", "key": event.HANDLER_KEY, "event": event.model_dump()})
         return self.whr[-1]
 
     async def _dissociate_subscription(
-        self,
-        event: WebHookEventSubscriptionExpired | WebHookEventSubscriptionCancelled,
-        payment_details: CapturedPayment,
+        self, event: WebHookEventSubscriptionExpired | WebHookEventSubscriptionCancelled
     ) -> Any:
-        self.whr.append(
-            {
-                "handle": "dissociate_subscription",
-                "key": event.HANDLER_KEY,
-                "event": event.model_dump(),
-                "payment_details": payment_details.model_dump(),
-            }
-        )
+        self.whr.append({"handle": "dissociate_subscription", "key": event.HANDLER_KEY, "event": event.model_dump()})
         return self.whr[-1]
 
-    async def _warn_subscription_failure(
-        self, event: WebHookEventSubscriptionPaymentFailed, payment_details: CapturedPayment
-    ) -> Any:
-        self.whr.append(
-            {
-                "handle": "warn_subscription_failure",
-                "key": event.HANDLER_KEY,
-                "event": event.model_dump(),
-                "payment_details": payment_details.model_dump(),
-            }
-        )
+    async def _warn_subscription_failure(self, event: WebHookEventSubscriptionPaymentFailed) -> Any:
+        self.whr.append({"handle": "warn_subscription_failure", "key": event.HANDLER_KEY, "event": event.model_dump()})
         return self.whr[-1]
 
     async def _grant_subscription(self, event: WebHookEventSaleCompleted, payment_details: CapturedPayment) -> Any:

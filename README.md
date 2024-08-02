@@ -18,7 +18,7 @@ notifications can be used in sandbox.
         r$ python3.10 -m venv .paypal2-venv
         r$ source .paypal2-venv/bin/activate
         r$ mkdir paypal2 && cd paypal2 && tar -xf ../paypal2.tgz
-        r$ pip install whell
+        r$ pip install wheel
         r$ pip install -r requirements/test.txt
         r$ pip install --no-deps -e .
 2. Setting up a temporary endpoint on an existing domain for testing using nginx. Add the following location snippet to a suitable server. The path prefix may need adjustment, and basic HTTP authentication can be added for safety, although no secret shall be revealed by the dev-api and it may only interface with the sandbox environment. Check the config and reload your nginx as you like.

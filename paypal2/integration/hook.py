@@ -43,24 +43,20 @@ class AbstractPayPalWebHookProcessor(PayPalWebHookProcessorBase):
             return captured_payment
 
     async def event_subscription_created(self, event: WebHookEventSubscriptionCreated) -> Any:
-        payment_details = await self._get_payment_details_with_custom_id(event.resource)
-        if payment_details:
-            return await self._associate_subscription(event, payment_details)
+        if event.resource.custom_id:
+            return await self._associate_subscription(event)
 
     async def event_subscription_expired(self, event: WebHookEventSubscriptionExpired) -> Any:
-        payment_details = await self._get_payment_details_with_custom_id(event.resource)
-        if payment_details:
-            return await self._dissociate_subscription(event, payment_details)
+        if event.resource.custom_id:
+            return await self._dissociate_subscription(event)
 
     async def event_subscription_cancelled(self, event: WebHookEventSubscriptionCancelled) -> Any:
-        payment_details = await self._get_payment_details_with_custom_id(event.resource)
-        if payment_details:
-            return await self._dissociate_subscription(event, payment_details)
+        if event.resource.custom_id:
+            return await self._dissociate_subscription(event)
 
     async def event_subscription_payment_failed(self, event: WebHookEventSubscriptionPaymentFailed) -> Any:
-        payment_details = await self._get_payment_details_with_custom_id(event.resource)
-        if payment_details:
-            return await self._warn_subscription_failure(event, payment_details)
+        if event.resource.custom_id:
+            return await self._warn_subscription_failure(event)
 
     async def event_sale_completed(self, event: WebHookEventSaleCompleted) -> Any:
         payment_details = await self._get_payment_details_with_custom_id(event.resource)
@@ -95,9 +91,7 @@ class AbstractPayPalWebHookProcessor(PayPalWebHookProcessorBase):
     # async def event_fallback(self, event: WebHookEvent) -> Any:
     #     pass
 
-    async def _associate_subscription(
-        self, event: WebHookEventSubscriptionCreated, payment_details: CapturedPayment
-    ) -> Any:
+    async def _associate_subscription(self, event: WebHookEventSubscriptionCreated) -> Any:
         """
         For tracking a subscription on the server, save the subscription resource-id to the subscriber denoted by the
         custom_id.
@@ -105,9 +99,7 @@ class AbstractPayPalWebHookProcessor(PayPalWebHookProcessorBase):
         raise NotImplementedError()
 
     async def _dissociate_subscription(
-        self,
-        event: WebHookEventSubscriptionExpired | WebHookEventSubscriptionCancelled,
-        payment_details: CapturedPayment,
+        self, event: WebHookEventSubscriptionExpired | WebHookEventSubscriptionCancelled
     ) -> Any:
         """
         For tracking a subscription on the server, discard the subscription resource-id from the subscriber denoted by
@@ -115,9 +107,7 @@ class AbstractPayPalWebHookProcessor(PayPalWebHookProcessorBase):
         """
         raise NotImplementedError()
 
-    async def _warn_subscription_failure(
-        self, event: WebHookEventSubscriptionPaymentFailed, payment_details: CapturedPayment
-    ) -> Any:
+    async def _warn_subscription_failure(self, event: WebHookEventSubscriptionPaymentFailed) -> Any:
         """
         Notify the subscriber denoted by the custom_id that their subscription payment could not be processed.
         """
