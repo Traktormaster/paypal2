@@ -1,7 +1,14 @@
 from typing import Optional
 
-from paypal2.models.common import MonetaryValue
+from paypal2.models.common import MonetaryValue, PlanBillingCycle
 from paypal2.models.order import OrdersCreate, PurchaseUnit, Item, MonetaryValueWithBreakdown, Breakdown
+
+
+def get_regular_billing_cycle(billing_cycles: Optional[list[PlanBillingCycle]]) -> Optional[PlanBillingCycle]:
+    for bc in billing_cycles or []:
+        if bc.tenure_type == "REGULAR":
+            if bc.pricing_scheme and bc.frequency:
+                return bc
 
 
 def format_monetary_value(v: float | int) -> str:

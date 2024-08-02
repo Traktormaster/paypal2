@@ -17,6 +17,7 @@ from paypal2.models.hook import (
     WebHookSubscriptionResourceV2,
 )
 from paypal2.models.payment import CapturedPayment
+from paypal2.utility import get_regular_billing_cycle
 
 
 class AbstractPayPalWebHookProcessor(PayPalWebHookProcessorBase):
@@ -75,18 +76,14 @@ class AbstractPayPalWebHookProcessor(PayPalWebHookProcessorBase):
             return await self._revoke_subscription(event, payment_details)
 
     async def event_plan_created(self, event: WebHookEventPlanCreated) -> Any:
-        for bc in event.resource.billing_cycles or []:
-            if bc.tenure_type == "REGULAR":
-                if bc.pricing_scheme and bc.frequency:  # these should be present always
-                    return await self._track_plan_pricing(event, bc)
-                break  # NOTE: At most one "REGULAR", so we can exit.
+        regular_bc = get_regular_billing_cycle(event.resource.billing_cycles)
+        if regular_bc:
+            return await self._track_plan_pricing(event, regular_bc)
 
     async def event_plan_updated(self, event: WebHookEventPlanUpdated) -> Any:
-        for bc in event.resource.billing_cycles or []:
-            if bc.tenure_type == "REGULAR":
-                if bc.pricing_scheme and bc.frequency:  # these should be present always
-                    return await self._track_plan_pricing(event, bc)
-                break  # NOTE: At most one "REGULAR", so we can exit.
+        regular_bc = get_regular_billing_cycle(event.resource.billing_cycles)
+        if regular_bc:
+            return await self._track_plan_pricing(event, regular_bc)
 
     # async def event_fallback(self, event: WebHookEvent) -> Any:
     #     pass
@@ -132,5 +129,7 @@ class AbstractPayPalWebHookProcessor(PayPalWebHookProcessorBase):
     ) -> Any:
         """
         Track the property changes of the plan resource. The "REGULAR" billing cycle is selected for convenience.
+        NOTE: The server must query and update the tracked plans on startup using the plan_details(...) api and only
+        rely on the webhooks to keep the state synced.
         """
         raise NotImplementedError()
