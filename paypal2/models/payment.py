@@ -16,10 +16,10 @@ class CapturedPayment(BaseModel):
     disbursement_mode: Optional[Literal["INSTANT", "DELAYED"]] = Field(
         min_length=1, max_length=16, pattern=r"^[A-Z_]+$", default="INSTANT"
     )
-    links: list[HATEOASLink]
     amount: Optional[MonetaryValue] = None
     create_time: Optional[datetime] = None
     update_time: Optional[datetime] = None
+    links: list[HATEOASLink]
     # todo network_transaction_reference
     # todo seller_protection
     # todo seller_receivable_breakdown

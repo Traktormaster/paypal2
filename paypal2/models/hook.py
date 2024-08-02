@@ -22,16 +22,16 @@ class WebHookSubscriptionResourceV2(BaseModel):
     status: str
     status_update_time: Optional[str] = None
     plan_id: str
+    custom_id: Optional[str] = None
     start_time: Optional[str] = None
     auto_renewal: Optional[bool] = None
-    links: list[HATEOASLink]
-    custom_id: Optional[str] = None
     create_time: Optional[datetime] = None
+    update_time: Optional[datetime] = None
+    links: list[HATEOASLink]
     # todo quantity
     # todo shipping_amount
     # todo subscriber
     # todo billing_info
-    # todo update_time
 
 
 class WebHookPlanResourceV2(BaseModel):
@@ -45,8 +45,8 @@ class WebHookPlanResourceV2(BaseModel):
     billing_cycles: Optional[list[PlanBillingCycle]] = None
     payment_preferences: Optional[PlanPaymentPreferences] = None
     taxes: Optional[PlanTaxes] = None
-    # todo create_time
-    # todo update_time
+    create_time: Optional[datetime] = None
+    update_time: Optional[datetime] = None
 
 
 class MonetaryTotal(BaseModel):
@@ -60,8 +60,8 @@ class WebHookSaleResource(BaseModel):
     state: str
     amount: Optional[MonetaryTotal] = None
     links: list[HATEOASLink]
-    # todo create_time
-    # todo update_time for complete, refund
+    create_time: Optional[datetime] = None
+    update_time: Optional[datetime] = None  # for complete and refund
     # todo sale_id for refund
     # todo parent_payment for complete, refund
     # todo clearing_time for complete
@@ -69,7 +69,11 @@ class WebHookSaleResource(BaseModel):
     # todo protection_eligibility for complete
     # todo protection_eligibility_type for complete
 
-    # fixme is custom_id here if it is set on subscription maybe? (if not it can be queried by the payments/details)
+    # NOTE: There is a "custom" field here with the value of the subscription's "custom_id" if any, but there is no
+    # mention of this field in the official documentation, so I'm not sure if we should rely on it at all. The web-hook
+    # processing of the integration layer does not utilize this, but queries the related captured-payment details which
+    # has an official "custom_id" field.
+    custom: Optional[str] = None
 
 
 class WebHookEventSubscriptionCreated(WebHookEvent):

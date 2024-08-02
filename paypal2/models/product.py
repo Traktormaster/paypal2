@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional, Literal
 
 from pydantic import BaseModel, Field
@@ -17,10 +18,9 @@ class _ProductCommon(_ProductMinimalCommon):
 
 
 class ProductDetails(_ProductCommon):
-    pass
+    create_time: Optional[datetime] = None
+    update_time: Optional[datetime] = None
     # todo links
-    # todo create_time
-    # todo update_time
 
 
 class ProductCreate(_ProductCommon):
@@ -29,9 +29,8 @@ class ProductCreate(_ProductCommon):
 
 
 class ProductListProduct(_ProductMinimalCommon):
-    pass
+    create_time: Optional[datetime] = None
     # todo links
-    # todo create_time
 
 
 class ProductList(BaseModel):

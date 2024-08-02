@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -9,7 +10,7 @@ class SubscriptionCreate(BaseModel):
     id: str = Field(min_length=26, max_length=26)
     quantity: Optional[str] = Field(min_length=1, max_length=32, default=None)
     custom_id: Optional[str] = Field(min_length=1, max_length=127, default=None)  # can be invoice id
-    # todo start_time
+    start_time: Optional[datetime] = None
     # todo shipping_amount
     # todo subscriber
     # todo application_context
@@ -30,14 +31,14 @@ class SubscriptionDetails(BaseModel):
     status: Optional[str] = Field(min_length=1, max_length=24, default=None)
     status_change_note: Optional[str] = Field(min_length=1, max_length=128, default=None)
     status_update_time: Optional[str] = Field(min_length=20, max_length=64, default=None)
-    # todo plan_overridden
-    # todo start_time
+    plan_overridden: Optional[bool] = None
+    start_time: Optional[datetime] = None
+    create_time: Optional[datetime] = None
+    update_time: Optional[datetime] = None
     # todo shipping_amount
     # todo subscriber
     # todo application_context
     # todo plan
-    # todo create_time
-    # todo update_time
 
 
 class SubscriptionReason(BaseModel):

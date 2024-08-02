@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional, Literal
 
 from pydantic import BaseModel, Field
@@ -70,7 +71,7 @@ class OrderCreated(OrderMinimalResponse):
         min_length=1, max_length=36, pattern=r"^[0-9A-Z_]+$", default="NO_INSTRUCTION"
     )
     intent: Optional[Literal["CAPTURE", "AUTHORIZE"]] = None
+    create_time: Optional[datetime] = None
+    update_time: Optional[datetime] = None
     # todo payer
     # todo purchase_units
-    # todo create_time
-    # todo update_time

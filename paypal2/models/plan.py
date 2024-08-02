@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional, Literal
 
 from pydantic import BaseModel, Field
@@ -14,7 +15,7 @@ class PlanMinimalResponse(BaseModel):
 class _PlanCommon(BaseModel):
     product_id: str = Field(min_length=22, max_length=22)
     name: str = Field(min_length=1, max_length=127)
-    # TODO status
+    status: Literal["CREATED", "INACTIVE", "ACTIVE"] = Field(min_length=1, max_length=24, default="ACTIVE")
     description: Optional[str] = Field(min_length=1, max_length=127, default=None)
     billing_cycles: Optional[list[PlanBillingCycle]] = Field(min_length=1, max_length=12, default=None)
     payment_preferences: Optional[PlanPaymentPreferences] = None
@@ -27,18 +28,18 @@ class PlanCreate(_PlanCommon):
 
 class PlanDetails(_PlanCommon):
     id: str = Field(min_length=26, max_length=26)
+    create_time: Optional[datetime] = None
+    update_time: Optional[datetime] = None
     # todo quantity_supported
     # todo links
-    # todo create_time
-    # todo update_time
 
 
 class PlanListPlan(_PlanCommon):
     id: str = Field(min_length=26, max_length=26)
+    create_time: Optional[datetime] = None
+    update_time: Optional[datetime] = None
     # todo quantity_supported
     # todo links
-    # todo create_time
-    # todo update_time
 
 
 class PlanList(BaseModel):
