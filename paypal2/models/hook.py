@@ -31,7 +31,7 @@ class WebHookCaptureResourceV2(BaseModel):
     supplementary_data: Optional[PaymentSupplementaryData] = None
     create_time: Optional[datetime] = None
     update_time: Optional[datetime] = None
-    links: list[HATEOASLink]
+    # links: list[HATEOASLink]
     # todo seller_protection
     # todo seller_receivable_breakdown
     # todo payee
@@ -48,7 +48,7 @@ class WebHookSubscriptionResourceV2(BaseModel):
     auto_renewal: Optional[bool] = None
     create_time: Optional[datetime] = None
     update_time: Optional[datetime] = None
-    links: list[HATEOASLink]
+    # links: list[HATEOASLink]
     # todo quantity
     # todo shipping_amount
     # todo subscriber
@@ -62,12 +62,12 @@ class WebHookPlanResourceV2(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     usage_type: Optional[str] = None
-    links: list[HATEOASLink]
     billing_cycles: Optional[list[PlanBillingCycle]] = None
     payment_preferences: Optional[PlanPaymentPreferences] = None
     taxes: Optional[PlanTaxes] = None
     create_time: Optional[datetime] = None
     update_time: Optional[datetime] = None
+    # links: list[HATEOASLink]
 
 
 class MonetaryTotal(BaseModel):
@@ -80,9 +80,9 @@ class WebHookSaleResource(BaseModel):
     id: str
     state: str
     amount: Optional[MonetaryTotal] = None
-    links: list[HATEOASLink]
     create_time: Optional[datetime] = None
     update_time: Optional[datetime] = None  # for complete and refund
+    # links: list[HATEOASLink]
     # todo sale_id for refund
     # todo parent_payment for complete, refund
     # todo clearing_time for complete

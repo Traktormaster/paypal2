@@ -8,7 +8,7 @@ from fastapi import Depends
 from paypal2.client import PayPalApiClient
 from paypal2.integration.deps import PayPalDeps
 from paypal2.models.common import MonetaryValue, PlanPricingModel, PlanFrequency
-from paypal2.models.plan import PlanCreate, PlanBillingCycle,  PlanPaymentPreferences
+from paypal2.models.plan import PlanCreate, PlanBillingCycle, PlanPaymentPreferences
 from paypal2.models.product import ProductCreate
 
 
@@ -27,7 +27,7 @@ class GlobalDeps(PayPalDeps):
         await cls.setup_paypal(
             os.environ["PAYPAL2_TESTING_CLIENT_ID"],
             os.environ["PAYPAL2_TESTING_CLIENT_SECRET"],
-            os.environ.get("PAYPAL2_TESTING_WEBHOOK_ID", "WEBHOOK_ID"),  # "WEBHOOK_ID" is for simulated calls
+            webhook_id=os.environ.get("PAYPAL2_TESTING_WEBHOOK_ID", "WEBHOOK_ID"),  # constant is for simulated calls
         )
         cls.PAYPAL.url_base = cls.PAYPAL.SANDBOX_URL_BASE
         await cls._setup_subscription_plan(cls.PAYPAL)
