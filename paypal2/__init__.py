@@ -7,4 +7,4 @@ Paypal2
 
 __copyright__ = "Copyright 2024 Nándor Mátravölgyi"
 __credits__ = ["Nándor Mátravölgyi"]
-__version__ = "0.1.3"
+__version__ = "0.2.0"
