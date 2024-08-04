@@ -5,7 +5,7 @@ from collections import defaultdict
 from setuptools import setup, find_packages
 
 HERE = os.path.abspath(os.path.dirname(__file__))
-VERSION = "0.2.0"
+VERSION = "0.2.1"
 
 with open(os.path.join(HERE, "README.md"), encoding="utf-8") as f:
     long_description = f.read()
