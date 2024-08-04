@@ -1,4 +1,4 @@
-from typing import Optional, Literal
+from typing import Optional, Literal, ClassVar
 
 from pydantic import BaseModel, Field
 
@@ -46,6 +46,12 @@ class PlanPricingModel(BaseModel):
 class PlanFrequency(BaseModel):
     interval_unit: Literal["DAY", "WEEK", "MONTH", "YEAR"]
     interval_count: int = Field(ge=1, le=365, default=1)  # NOTE: maximum depends on interval_unit
+
+    INTERVAL_DAYS: ClassVar = {"DAY": 1, "WEEK": 7, "MONTH": 31, "YEAR": 365}
+
+    @property
+    def interval_as_days(self) -> int:
+        return self.INTERVAL_DAYS[self.interval_unit] * self.interval_count
 
 
 class PlanBillingCycle(BaseModel):
