@@ -1,5 +1,3 @@
-from typing import Optional
-
 from paypal2.client import PayPalApiClient
 
 
@@ -7,8 +5,8 @@ class PayPalDeps:
     PAYPAL: PayPalApiClient = None
 
     @classmethod
-    async def setup_paypal(cls, client_id: str, client_secret: str, webhook_id: Optional[str] = None):
-        pp = PayPalApiClient(client_id, client_secret, webhook_id=webhook_id)
+    async def setup_paypal(cls, *args, **kwargs):
+        pp = PayPalApiClient(*args, **kwargs)
         await pp.setup()
         cls.PAYPAL = pp
         return pp
