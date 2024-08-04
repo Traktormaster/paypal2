@@ -3,8 +3,14 @@ from typing import Optional, ClassVar
 
 from pydantic import BaseModel, Field
 
-from paypal2.models.common import HATEOASLink, PlanBillingCycle, PlanPaymentPreferences, PlanTaxes, MonetaryValue, \
-    PaymentSupplementaryData
+from paypal2.models.common import (
+    HATEOASLink,
+    PlanBillingCycle,
+    PlanPaymentPreferences,
+    PlanTaxes,
+    MonetaryValue,
+    PaymentSupplementaryData,
+)
 
 
 class WebHookEvent(BaseModel):
@@ -108,6 +114,16 @@ class WebHookEventCaptureRefunded(WebHookEvent):
 
 class WebHookEventSubscriptionCreated(WebHookEvent):
     HANDLER_KEY: ClassVar = ("BILLING.SUBSCRIPTION.CREATED", "subscription", "2.0")
+    resource: WebHookSubscriptionResourceV2
+
+
+class WebHookEventSubscriptionActivated(WebHookEvent):
+    HANDLER_KEY: ClassVar = ("BILLING.SUBSCRIPTION.ACTIVATED", "subscription", "2.0")
+    resource: WebHookSubscriptionResourceV2
+
+
+class WebHookEventSubscriptionSuspended(WebHookEvent):
+    HANDLER_KEY: ClassVar = ("BILLING.SUBSCRIPTION.SUSPENDED", "subscription", "2.0")
     resource: WebHookSubscriptionResourceV2
 
 

@@ -11,7 +11,6 @@ def test_simple_single_item_order_create():
     for _ in range(1000):
         o = simple_single_item_order_create(
             "A",
-            "B",
             round(0.1 + 3000 * random.random(), 2),
             tax=round(0.1 + 500 * random.random(), 2) if random.random() > 0.5 else None,
             quantity=random.randint(1, 120),
@@ -31,7 +30,6 @@ def test_simple_single_item_order_create():
     for _ in range(1000):
         o = simple_single_item_order_create(
             "A",
-            "B",
             random.randint(1, 1000000),
             tax=random.randint(1, 200000) if random.random() > 0.5 else None,
             quantity=random.randint(1, 120),

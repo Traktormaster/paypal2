@@ -6,6 +6,8 @@ from paypal2.models.hook import (
     WebHookEventCaptureReversed,
     WebHookEventCaptureRefunded,
     WebHookEventSubscriptionCreated,
+    WebHookEventSubscriptionActivated,
+    WebHookEventSubscriptionSuspended,
     WebHookEventSubscriptionExpired,
     WebHookEventSubscriptionCancelled,
     WebHookEventSubscriptionPaymentFailed,
@@ -40,6 +42,8 @@ class PayPalWebHookProcessorBase:
             WebHookEventCaptureReversed: self.event_capture_reversed,
             WebHookEventCaptureRefunded: self.event_capture_refunded,
             WebHookEventSubscriptionCreated: self.event_subscription_created,
+            WebHookEventSubscriptionActivated: self.event_subscription_activated,
+            WebHookEventSubscriptionSuspended: self.event_subscription_suspended,
             WebHookEventSubscriptionExpired: self.event_subscription_expired,
             WebHookEventSubscriptionCancelled: self.event_subscription_cancelled,
             WebHookEventSubscriptionPaymentFailed: self.event_subscription_payment_failed,
@@ -82,18 +86,34 @@ class PayPalWebHookProcessorBase:
 
     async def event_subscription_created(self, event: WebHookEventSubscriptionCreated) -> Any:
         """
-        Record the subscription to the relevant party if tracking is desired for information or performing actions
-        like suspend or continue for example.
+        This is the first event where the new subscription-id (id), plan_id and custom_id are all present and have
+        clear relations to each other. The server should record these associations for later, for example a
+        sale-completed event will only connect to the subscription through the custom_id (queried from the captured
+        payment endpoint).
+        Tracking the subscription for a user/identity may be desired for information or performing actions like
+        suspend or continue for example anyway.
+        """
+
+    async def event_subscription_activated(self, event: WebHookEventSubscriptionActivated) -> Any:
+        """
+        Record the subscription state change for the relevant party if it is tracked.
+        """
+
+    async def event_subscription_suspended(self, event: WebHookEventSubscriptionSuspended) -> Any:
+        """
+        Record the subscription state change for the relevant party if it is tracked.
         """
 
     async def event_subscription_expired(self, event: WebHookEventSubscriptionExpired) -> Any:
         """
-        Remove the subscription from the relevant party if it is tracked, because it is no longer valid.
+        Record the subscription state change or remove the subscription from the relevant party if it is tracked,
+        because it is no longer valid.
         """
 
     async def event_subscription_cancelled(self, event: WebHookEventSubscriptionCancelled) -> Any:
         """
-        Remove the subscription from the relevant party if it is tracked, because it is no longer valid.
+        Record the subscription state change or remove the subscription from the relevant party if it is tracked,
+        because it is no longer valid.
         """
 
     async def event_subscription_payment_failed(self, event: WebHookEventSubscriptionPaymentFailed) -> Any:

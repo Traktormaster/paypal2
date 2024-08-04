@@ -18,14 +18,16 @@ def format_monetary_value(v: float | int) -> str:
 
 
 def simple_single_item_order_create(
-    item_id: str,
     item_name: str,
     price: float | int,
     currency_code: str = "USD",
+    custom_id: Optional[str] = None,
+    invoice_id: Optional[str] = None,
     tax: Optional[float | int] = None,
     quantity: int = 1,
     category: str = "DIGITAL_GOODS",
     intent: str = "CAPTURE",
+    reference_id: Optional[str] = None,  # NOTE: does not appear in webhook messages
 ) -> OrdersCreate:
     assert quantity > 0
     unit_amount = MonetaryValue(currency_code=currency_code, value=format_monetary_value(price))
@@ -42,9 +44,11 @@ def simple_single_item_order_create(
     return OrdersCreate(
         purchase_units=[
             PurchaseUnit(
+                reference_id=reference_id,
+                custom_id=custom_id,
+                invoice_id=invoice_id,
                 items=[
                     Item(
-                        id=item_id,
                         name=item_name,
                         quantity=str(quantity),
                         category=category,

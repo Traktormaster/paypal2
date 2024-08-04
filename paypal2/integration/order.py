@@ -11,6 +11,7 @@ class AbstractOrderCreateProcess:
         self.pp = pp
 
     async def run(self, request: OrdersCreate) -> OrderMinimalResponse:
+        await self._validate_request(request)
         try:
             order_response = await self.pp.order_create(request)
         except Exception as e:
@@ -18,6 +19,12 @@ class AbstractOrderCreateProcess:
             raise e
         await self._complete_create(order_response)
         return order_response
+
+    async def _validate_request(self, request: OrdersCreate):
+        """
+        Validate the order data and any custom server-local data related to the order.
+        Raise an exception if something is not correct.
+        """
 
     async def _handle_pp_exception(self, e: Exception):
         """

@@ -54,6 +54,14 @@ class JsonBadRequest(aiohttp.ClientResponseError):
         self.data = data
 
 
+class AbstractExternalWebHookCertificateStore:
+    async def get(self, url: str) -> Optional[bytes]:
+        raise NotImplementedError()
+
+    async def set(self, url: str, content: bytes):
+        raise NotImplementedError()
+
+
 class PayPalApiClient:
     __slots__ = (
         "client_id",
@@ -63,6 +71,7 @@ class PayPalApiClient:
         "session",
         "session_owned",
         "webhook_id",
+        "external_cert_store",
         "_access_token",
         "_cert_cache",
     )
@@ -84,6 +93,7 @@ class PayPalApiClient:
         proxy_address: str = None,
         session: aiohttp.ClientSession = None,
         webhook_id: str = None,
+        external_cert_store: Optional[AbstractExternalWebHookCertificateStore] = None,
     ):
         self.client_id = client_id
         self.__client_secret = client_secret
@@ -92,6 +102,7 @@ class PayPalApiClient:
         self.session_owned = session is None
         self.session = session
         self.webhook_id = webhook_id
+        self.external_cert_store = external_cert_store
         # state
         self._access_token = None
         self._cert_cache = TTLDict(14 * 24 * 60 * 60.0, max_items=10)
@@ -313,15 +324,24 @@ class PayPalApiClient:
             or not isinstance(transmission_cert_url, str)
         ):
             raise ValueError("Paypal webhook headers invalid")
+        if self.url_base != self.SANDBOX_URL_BASE and not transmission_cert_url.startswith("https://api.paypal.com/"):
+            raise ValueError("Paypal webhook cert url is not from PayPal API")
         rsa_pub_key = self._cert_cache.get(transmission_cert_url, touch=True)
         if not rsa_pub_key:
-            async with self.session.get(transmission_cert_url) as r:
-                r.raise_for_status()
-                transmission_cert = await r.read()
+            transmission_cert = None
+            if self.external_cert_store:
+                transmission_cert = await self.external_cert_store.get(transmission_cert_url)
+            if not transmission_cert:
+                async with self.session.get(transmission_cert_url) as r:
+                    r.raise_for_status()
+                    transmission_cert = await r.read()
             rsa_pub_key = RSA.import_key(transmission_cert)
             if rsa_pub_key.has_private():
                 raise ValueError("Paypal webhook transmission key imported as private")
+            if self.external_cert_store:
+                await self.external_cert_store.set(transmission_cert_url, transmission_cert)
             self._cert_cache[transmission_cert_url] = rsa_pub_key
+        # TODO: crc, hash, signature check and json load could be offloaded to worker thread?
         body_checksum = zlib.crc32(body)
         message = f"{transmission_id}|{transmission_time}|{webhook_id}|{body_checksum}"
         hashed = SHA256.new(message.encode())

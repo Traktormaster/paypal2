@@ -10,6 +10,8 @@ from paypal2.models.hook import (
     WebHookEventCaptureReversed,
     WebHookEventCaptureRefunded,
     WebHookEventSubscriptionCreated,
+    WebHookEventSubscriptionActivated,
+    WebHookEventSubscriptionSuspended,
     WebHookEventSubscriptionExpired,
     WebHookEventSubscriptionCancelled,
     WebHookEventSubscriptionPaymentFailed,
@@ -37,6 +39,14 @@ class DebugPayPalWebHookProcessor(AbstractPayPalWebHookProcessor):
     async def _associate_subscription(self, event: WebHookEventSubscriptionCreated) -> Any:
         self.whr.append(
             {"handle": "associate_subscription", "key": event.HANDLER_KEY, "event": event.model_dump(mode="json")}
+        )
+        return self.whr[-1]
+
+    async def _track_subscription(
+        self, event: WebHookEventSubscriptionActivated | WebHookEventSubscriptionSuspended
+    ) -> Any:
+        self.whr.append(
+            {"handle": "track_subscription", "key": event.HANDLER_KEY, "event": event.model_dump(mode="json")}
         )
         return self.whr[-1]
 
@@ -116,6 +126,14 @@ class DebugPayPalWebHookProcessorBase(PayPalWebHookProcessorBase):
         return self.whr[-1]
 
     async def event_subscription_created(self, event: WebHookEventSubscriptionCreated) -> Any:
+        self.whr.append({"key": event.HANDLER_KEY, "event": event.model_dump(mode="json")})
+        return self.whr[-1]
+
+    async def event_subscription_activated(self, event: WebHookEventSubscriptionActivated) -> Any:
+        self.whr.append({"key": event.HANDLER_KEY, "event": event.model_dump(mode="json")})
+        return self.whr[-1]
+
+    async def event_subscription_suspended(self, event: WebHookEventSubscriptionSuspended) -> Any:
         self.whr.append({"key": event.HANDLER_KEY, "event": event.model_dump(mode="json")})
         return self.whr[-1]
 

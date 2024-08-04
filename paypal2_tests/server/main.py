@@ -66,7 +66,7 @@ class OrderCreateProcessTester(AbstractOrderCreateProcess):
 @app.post("/api/order-create", response_model=OrderMinimalResponse)
 async def api_order_create(pp: PayPalDep, req: OrderCreateApiRequest):
     unit_value = round(0.5 + 10000 * random.random(), 2)
-    request = simple_single_item_order_create(req.id, "some service for order testing", unit_value)
+    request = simple_single_item_order_create("some service for order testing", unit_value, custom_id=req.id)
     return await OrderCreateProcessTester(pp).run(request)
 
 

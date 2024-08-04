@@ -30,6 +30,8 @@ from paypal2_tests.const import (
     HOOK_SUBSCRIPTION_CANCELLED_V1,
     HOOK_PLAN_CREATED_V1,
     HOOK_PLAN_UPDATED_V1,
+    HOOK_SUBSCRIPTION_ACTIVATED_v2,
+    HOOK_SUBSCRIPTION_SUSPENDED_V2,
 )
 from paypal2_tests.utility import ServerProc
 
@@ -92,6 +94,8 @@ async def _webhook_check(server_proc: ServerProc, httpserver: HTTPServer):
             HOOK_PAYMENT_CAPTURE_REVERSED_V2,
             HOOK_PAYMENT_CAPTURE_DECLINED_V2,
             HOOK_SUBSCRIPTION_CREATED_v2,
+            HOOK_SUBSCRIPTION_ACTIVATED_v2,
+            HOOK_SUBSCRIPTION_SUSPENDED_V2,
             HOOK_SUBSCRIPTION_EXPIRED_V2,
             HOOK_SUBSCRIPTION_CANCELLED_V2,
             HOOK_SUBSCRIPTION_PAYMENT_FAILED_V2,

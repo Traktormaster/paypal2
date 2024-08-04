@@ -17,6 +17,8 @@ from paypal2.models.hook import (
     WebHookEventPlanUpdated,
     WebHookSaleResource,
     WebHookSubscriptionResourceV2,
+    WebHookEventSubscriptionActivated,
+    WebHookEventSubscriptionSuspended,
 )
 from paypal2.models.payment import CapturedPayment
 from paypal2.utility import get_regular_billing_cycle
@@ -57,6 +59,14 @@ class AbstractPayPalWebHookProcessor(PayPalWebHookProcessorBase):
     async def event_subscription_created(self, event: WebHookEventSubscriptionCreated) -> Any:
         if event.resource.custom_id:
             return await self._associate_subscription(event)
+
+    async def event_subscription_activated(self, event: WebHookEventSubscriptionActivated) -> Any:
+        if event.resource.custom_id:
+            return await self._track_subscription(event)
+
+    async def event_subscription_suspended(self, event: WebHookEventSubscriptionSuspended) -> Any:
+        if event.resource.custom_id:
+            return await self._track_subscription(event)
 
     async def event_subscription_expired(self, event: WebHookEventSubscriptionExpired) -> Any:
         if event.resource.custom_id:
@@ -107,8 +117,16 @@ class AbstractPayPalWebHookProcessor(PayPalWebHookProcessorBase):
 
     async def _associate_subscription(self, event: WebHookEventSubscriptionCreated) -> Any:
         """
-        For tracking a subscription on the server, save the subscription resource-id to the subscriber denoted by the
-        custom_id.
+        The relationship among subscription-id, plan-id, custom-id and likely user/party must be recorded so later
+        "grant_subscription" events can look up all the information from a "custom_id".
+        """
+        raise NotImplementedError()
+
+    async def _track_subscription(
+        self, event: WebHookEventSubscriptionActivated | WebHookEventSubscriptionSuspended
+    ) -> Any:
+        """
+        For tracking a subscription status on the server.
         """
         raise NotImplementedError()
 
@@ -116,8 +134,8 @@ class AbstractPayPalWebHookProcessor(PayPalWebHookProcessorBase):
         self, event: WebHookEventSubscriptionExpired | WebHookEventSubscriptionCancelled
     ) -> Any:
         """
-        For tracking a subscription on the server, discard the subscription resource-id from the subscriber denoted by
-        the custom_id.
+        For tracking a subscription on the server, mark or discard the subscription resource-id from the subscriber
+        denoted by the custom_id.
         """
         raise NotImplementedError()
 

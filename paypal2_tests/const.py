@@ -138,6 +138,46 @@ HOOK_SUBSCRIPTION_CREATED_v2 = ConstRequestData(
         "x-b3-spanid": "575d15fa3cb9fbc2",
     },
 )
+HOOK_SUBSCRIPTION_ACTIVATED_v2 = ConstRequestData(
+    body=b'{"id":"WH-77687562XN25889J8-8Y6T55435R66168T6","create_time":"2018-19-12T22:20:32.000Z","event_type":"BILLING.SUBSCRIPTION.ACTIVATED","event_version":"1.0","resource_type":"subscription","resource_version":"2.0","summary":"A billing agreement was activated.","resource":{"id":"I-BW452GLLEP1G","status":"ACTIVE","status_update_time":"2018-12-10T21:20:49Z","plan_id":"P-5ML4271244454362WXNWU5NQ","start_time":"2018-11-01T00:00:00Z","quantity":"20","shipping_amount":{"currency_code":"USD","value":"10.00"},"subscriber":{"name":{"given_name":"John","surname":"Doe"},"email_address":"customer@example.com","shipping_address":{"name":{"full_name":"John Doe"},"address":{"address_line_1":"2211 N First Street","address_line_2":"Building 17","admin_area_2":"San Jose","admin_area_1":"CA","postal_code":"95131","country_code":"US"}}},"auto_renewal":true,"billing_info":{"outstanding_balance":{"currency_code":"USD","value":"10.00"},"cycle_executions":[{"tenure_type":"TRIAL","sequence":1,"cycles_completed":1,"cycles_remaining":0,"current_pricing_scheme_version":1},{"tenure_type":"REGULAR","sequence":2,"cycles_completed":1,"cycles_remaining":0,"current_pricing_scheme_version":2}],"last_payment":{"amount":{"currency_code":"USD","value":"500.00"},"time":"2018-12-01T01:20:49Z"},"next_billing_time":"2019-01-01T00:20:49Z","final_payment_time":"2020-01-01T00:20:49Z","failed_payments_count":2},"create_time":"2018-12-10T21:20:49Z","update_time":"2018-12-10T21:20:49Z","links":[{"href":"https://api.paypal.com/v1/billing/subscriptions/I-BW452GLLEP1G","rel":"self","method":"GET"},{"href":"https://api.paypal.com/v1/billing/subscriptions/I-BW452GLLEP1G","rel":"edit","method":"PATCH"},{"href":"https://api.paypal.com/v1/billing/subscriptions/I-BW452GLLEP1G/suspend","rel":"suspend","method":"POST"},{"href":"https://api.paypal.com/v1/billing/subscriptions/I-BW452GLLEP1G/cancel","rel":"cancel","method":"POST"},{"href":"https://api.paypal.com/v1/billing/subscriptions/I-BW452GLLEP1G/capture","rel":"capture","method":"POST"}]},"links":[{"href":"https://api.paypal.com/v1/notifications/webhooks-events/WH-77687562XN25889J8-8Y6T55435R66168T6","rel":"self","method":"GET"},{"href":"https://api.paypal.com/v1/notifications/webhooks-events/WH-77687562XN25889J8-8Y6T55435R66168T6/resend","rel":"resend","method":"POST"}]}',
+    headers={
+        "x-real-ip": "173.0.81.140",
+        "host": "127.0.0.1:8001",
+        "connection": "close",
+        "content-length": "2305",
+        "accept": "*/*",
+        "paypal-transmission-id": "f46bd5a1-524a-11ef-a49a-617e348a3b92",
+        "paypal-transmission-time": "2024-08-04T10:18:55Z",
+        "paypal-transmission-sig": "bRTVVNBo6Jckqy0JDM07mJ69lTa5mwpNtQWWR+oZC34sQdR/xYE5XhTHajjLKPcNExtGHvPJVjQX4nEeZTwL3PWJSPYxcSfF4IBcI3qD43PryBzMSDQzFBcJykfkry2pNZMHGBIbujjoXE1SnkmuGEyahlg63OW+TyBML/WH8jDewb2vkp/sqbcuAS5P9CUEqErptu37h/bP6UYCcB1PZkg9HI4Vbs+P3Fu/Udcb9F3Vy/H846bttj7+eu/Cynf1YyQE2y2Q/basHoQHqYTMO3YD/TSMPZ2RySqN8EqPJaQYK0ZjlOJE/Qt04dJjsfn5PBqNv6vi/9yIPIVuBV8exw==",
+        "paypal-auth-version": "v2",
+        "paypal-cert-url": "https://api.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-1a5f47cb",
+        "paypal-auth-algo": "SHA256withRSA",
+        "content-type": "application/json",
+        "user-agent": "PayPal/AUHD-214.0-58391792",
+        "correlation-id": "c9637b5989aba",
+        "x-b3-spanid": "1ba1ff0f280a367b",
+    },
+)
+HOOK_SUBSCRIPTION_SUSPENDED_V2 = ConstRequestData(
+    body=b'{"id":"WH-T556Y7577TY258894E-45RT55435R66177TY","create_time":"2018-19-12T22:20:32.000Z","event_type":"BILLING.SUBSCRIPTION.SUSPENDED","event_version":"1.0","resource_type":"subscription","resource_version":"2.0","summary":"A billing subscription was suspended.","resource":{"id":"I-BW452GLLEP1G","status":"SUSPENDED","status_update_time":"2018-12-10T21:20:49Z","plan_id":"P-5ML4271244454362WXNWU5NQ","start_time":"2018-11-01T00:00:00Z","quantity":"20","shipping_amount":{"currency_code":"USD","value":"10.00"},"subscriber":{"name":{"given_name":"John","surname":"Doe"},"email_address":"customer@example.com","shipping_address":{"name":{"full_name":"John"},"address":{"address_line_1":"2211 N First Street","address_line_2":"Building 17","admin_area_2":"San Jose","admin_area_1":"CA","postal_code":"95131","country_code":"US"}}},"auto_renewal":true,"billing_info":{"outstanding_balance":{"currency_code":"USD","value":"10.00"},"cycle_executions":[{"tenure_type":"TRIAL","sequence":1,"cycles_completed":1,"cycles_remaining":0,"current_pricing_scheme_version":1},{"tenure_type":"REGULAR","sequence":2,"cycles_completed":1,"cycles_remaining":0,"current_pricing_scheme_version":1}],"last_payment":{"amount":{"currency_code":"USD","value":"500.00"},"time":"2018-12-01T01:20:49Z"},"next_billing_time":"2019-01-01T00:20:49Z","final_payment_time":"2020-01-01T00:20:49Z","failed_payments_count":2},"create_time":"2018-12-10T21:20:49Z","update_time":"2018-12-10T21:20:49Z","links":[{"href":"https://api.paypal.com/v1/billing/subscriptions/I-BW452GLLEP1G","rel":"self","method":"GET"},{"href":"https://api.paypal.com/v1/billing/subscriptions/I-BW452GLLEP1G","rel":"edit","method":"PATCH"},{"href":"https://api.paypal.com/v1/billing/subscriptions/I-BW452GLLEP1G/cancel","rel":"cancel","method":"POST"},{"href":"https://api.paypal.com/v1/billing/subscriptions/I-BW452GLLEP1G/activate","rel":"activate","method":"POST"},{"href":"https://api.paypal.com/v1/billing/subscriptions/I-BW452GLLEP1G/capture","rel":"capture","method":"POST"}]},"links":[{"href":"https://api.paypal.com/v1/notifications/webhooks-events/WH-T556Y7577TY258894E-45RT55435R66177TY","rel":"self","method":"GET"},{"href":"https://api.paypal.com/v1/notifications/webhooks-events/WH-T556Y7577TY258894E-45RT55435R66177TY/resend","rel":"resend","method":"POST"}]}',
+    headers={
+        "x-real-ip": "173.0.81.140",
+        "host": "127.0.0.1:8001",
+        "connection": "close",
+        "content-length": "2312",
+        "accept": "*/*",
+        "paypal-transmission-id": "11d87d00-524b-11ef-b8ce-c7666a62d00f",
+        "paypal-transmission-time": "2024-08-04T10:19:44Z",
+        "paypal-transmission-sig": "TyF1sPXcb3gT883pqR7I6jU5xU9z23T7bgSglVy2imeSew7MYb6WZA7qFJIdI/6hHTH48tgA0y1lyJsH/hcD4NkicIaKEJf81+wKD6GCr9mBxZvGQynvl+sPV07TM1izQdFfImvdQVAMDVDcjXLGvxqYmj2Wf/Hu3TQ1iWuERLF+r/aetS+AQwFat0CoVMhtkNJZtO1Kaz9KrJrAthtCGn6fOIpBBjUWAzgUqYbDVrv/d/TqwnqqbvxUrD0qY297CGXAaOZAlnaQDx2r3eClhl10ASLbiwzWvtzxVa8Dc5xdX5cNvjgSTSj373Vmyk7+kLnd7bzxWT+pLBOtscVRPA==",
+        "paypal-auth-version": "v2",
+        "paypal-cert-url": "https://api.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-1a5f47cb",
+        "paypal-auth-algo": "SHA256withRSA",
+        "content-type": "application/json",
+        "user-agent": "PayPal/AUHD-214.0-58391792",
+        "correlation-id": "984035f9cdc13",
+        "x-b3-spanid": "a6a9f33f5f15aea3",
+    },
+)
 HOOK_SUBSCRIPTION_EXPIRED_V2 = ConstRequestData(  # NOTE: seems to not have V1
     body=b'{"id":"WH-UY687577TY25889J9-2R6T55435R66168Y6","create_time":"2018-19-12T22:20:32.000Z","event_type":"BILLING.SUBSCRIPTION.EXPIRED","event_version":"1.0","resource_type":"subscription","resource_version":"2.0","summary":"A billing agreement has expired.","resource":{"id":"I-BW452GLLEP1G","status":"EXPIRED","status_update_time":"2018-12-10T21:20:49Z","plan_id":"P-5ML4271244454362WXNWU5NQ","start_time":"2018-11-01T00:00:00Z","quantity":"20","shipping_amount":{"currency_code":"USD","value":"10.00"},"subscriber":{"name":{"given_name":"John","surname":"Doe"},"email_address":"customer@example.com","shipping_address":{"name":{"full_name":"John Doe"},"address":{"address_line_1":"2211 N First Street","address_line_2":"Building 17","admin_area_2":"San Jose","admin_area_1":"CA","postal_code":"95131","country_code":"US"}}},"auto_renewal":true,"billing_info":{"outstanding_balance":{"currency_code":"USD","value":"10.00"},"cycle_executions":[{"tenure_type":"TRIAL","sequence":1,"cycles_completed":1,"cycles_remaining":0,"current_pricing_scheme_version":1},{"tenure_type":"REGULAR","sequence":2,"cycles_completed":1,"cycles_remaining":0,"current_pricing_scheme_version":1}],"last_payment":{"amount":{"currency_code":"USD","value":"500.00"},"time":"2018-12-01T01:20:49Z"},"next_billing_time":"2019-01-01T00:20:49Z","final_payment_time":"2020-01-01T00:20:49Z","failed_payments_count":2},"create_time":"2018-12-10T21:20:49Z","update_time":"2018-12-10T21:20:49Z","links":[{"href":"https://api.paypal.com/v1/billing/subscriptions/I-BW452GLLEP1G","rel":"self","method":"GET"}]},"links":[{"href":"https://api.paypal.com/v1/notifications/webhooks-events/WH-UY687577TY25889J9-2R6T55435R66168Y6","rel":"self","method":"GET"},{"href":"https://api.paypal.com/v1/notifications/webhooks-events/WH-UY687577TY25889J9-2R6T55435R66168Y6/resend","rel":"resend","method":"POST"}]}',
     headers={
@@ -198,7 +238,6 @@ HOOK_SUBSCRIPTION_PAYMENT_FAILED_V2 = ConstRequestData(  # NOTE: seems to not ha
         "x-b3-spanid": "78fcc92dddf9e465",
     },
 )
-# NOTE: there is also suspend and activate events for subscription.
 
 # These can be used to track subscription payment crediting.
 HOOK_PAYMENT_SALE_COMPLETED = ConstRequestData(

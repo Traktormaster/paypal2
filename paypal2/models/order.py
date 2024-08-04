@@ -43,8 +43,8 @@ class Item(BaseModel):
 class PurchaseUnit(BaseModel):
     reference_id: Optional[str] = Field(min_length=1, max_length=256, default=None)
     description: Optional[str] = Field(min_length=1, max_length=127, default=None)
-    custom_id: Optional[str] = Field(min_length=1, max_length=256, default=None)
-    invoice_id: Optional[str] = Field(min_length=1, max_length=256, default=None)
+    custom_id: Optional[str] = Field(min_length=1, max_length=255, default=None)
+    invoice_id: Optional[str] = Field(min_length=1, max_length=127, default=None)
     soft_descriptor: Optional[str] = Field(min_length=1, max_length=22, default=None)
     items: Optional[list[Item]] = None
     amount: MonetaryValueWithBreakdown
