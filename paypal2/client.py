@@ -89,7 +89,7 @@ class PayPalApiClient:
         self,
         client_id: str,
         client_secret: str,
-        url_base: str = PRODUCTION_URL_BASE,
+        url_base: str = None,
         proxy_address: str = None,
         session: aiohttp.ClientSession = None,
         webhook_id: str = None,
@@ -97,7 +97,7 @@ class PayPalApiClient:
     ):
         self.client_id = client_id
         self.__client_secret = client_secret
-        self.url_base = url_base
+        self.url_base = (url_base or self.PRODUCTION_URL_BASE).rstrip("/")
         self.proxy_address = proxy_address
         self.session_owned = session is None
         self.session = session
@@ -160,7 +160,7 @@ class PayPalApiClient:
         retry: int = 2,
         response_body: bool = True,
     ):
-        j = body.model_dump(exclude_unset=True) if isinstance(body, BaseModel) else body
+        j = body.model_dump(mode="json", exclude_unset=True) if isinstance(body, BaseModel) else body
         for i in range(1, retry + 1):
             try:
                 async with self._manage_access_token(raise_reset=i < retry) as access_token:
