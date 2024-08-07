@@ -9,7 +9,23 @@ from pytest_httpserver import HTTPServer
 from selenium.webdriver.remote.webdriver import WebDriver
 from werkzeug import Request, Response
 
-from paypal2.hook import PayPalWebHookProcessorBase
+from paypal2.models.hook import (
+    WebHookEventCaptureCompleted,
+    WebHookEventCaptureReversed,
+    WebHookEventCaptureRefunded,
+    WebHookEventSubscriptionCreated,
+    WebHookEventSubscriptionActivated,
+    WebHookEventSubscriptionSuspended,
+    WebHookEventSubscriptionExpired,
+    WebHookEventSubscriptionCancelled,
+    WebHookEventSubscriptionPaymentFailed,
+    WebHookEventSaleCompleted,
+    WebHookEventSaleReversed,
+    WebHookEventSaleRefunded,
+    WebHookEventPlanCreated,
+    WebHookEventPlanUpdated,
+    WebHookEvent,
+)
 from paypal2_tests.const import (
     HOOK_CERTS,
     HOOK_PAYMENT_CAPTURE_PENDING_V2,
@@ -87,28 +103,28 @@ async def _webhook_check(server_proc: ServerProc, httpserver: HTTPServer):
                     return d_["results"][0]
 
         await _get_webhook_result(ignore=True)  # clear remaining if any
-        for const_req in [
-            HOOK_PAYMENT_CAPTURE_PENDING_V2,
-            HOOK_PAYMENT_CAPTURE_COMPLETED_V2,
-            HOOK_PAYMENT_CAPTURE_REFUNDED_V2,
-            HOOK_PAYMENT_CAPTURE_REVERSED_V2,
-            HOOK_PAYMENT_CAPTURE_DECLINED_V2,
-            HOOK_SUBSCRIPTION_CREATED_v2,
-            HOOK_SUBSCRIPTION_ACTIVATED_v2,
-            HOOK_SUBSCRIPTION_SUSPENDED_V2,
-            HOOK_SUBSCRIPTION_EXPIRED_V2,
-            HOOK_SUBSCRIPTION_CANCELLED_V2,
-            HOOK_SUBSCRIPTION_PAYMENT_FAILED_V2,
-            HOOK_PAYMENT_SALE_COMPLETED,
-            HOOK_PAYMENT_SALE_REVERSED,
-            HOOK_PAYMENT_SALE_REFUNDED,
-            HOOK_PLAN_CREATED_V2,
-            HOOK_PLAN_UPDATED_V2,
+        for const_req, expected_handler in [
+            (HOOK_PAYMENT_CAPTURE_PENDING_V2, WebHookEvent),  # WebHookEventCapturePending),
+            (HOOK_PAYMENT_CAPTURE_COMPLETED_V2, WebHookEventCaptureCompleted),
+            (HOOK_PAYMENT_CAPTURE_REVERSED_V2, WebHookEventCaptureReversed),
+            (HOOK_PAYMENT_CAPTURE_REFUNDED_V2, WebHookEventCaptureRefunded),
+            (HOOK_PAYMENT_CAPTURE_DECLINED_V2, WebHookEvent),  # WebHookEventCaptureDeclined),
+            (HOOK_SUBSCRIPTION_CREATED_v2, WebHookEventSubscriptionCreated),
+            (HOOK_SUBSCRIPTION_ACTIVATED_v2, WebHookEventSubscriptionActivated),
+            (HOOK_SUBSCRIPTION_SUSPENDED_V2, WebHookEventSubscriptionSuspended),
+            (HOOK_SUBSCRIPTION_EXPIRED_V2, WebHookEventSubscriptionExpired),
+            (HOOK_SUBSCRIPTION_CANCELLED_V2, WebHookEventSubscriptionCancelled),
+            (HOOK_SUBSCRIPTION_PAYMENT_FAILED_V2, WebHookEventSubscriptionPaymentFailed),
+            (HOOK_PAYMENT_SALE_COMPLETED, WebHookEventSaleCompleted),
+            (HOOK_PAYMENT_SALE_REVERSED, WebHookEventSaleReversed),
+            (HOOK_PAYMENT_SALE_REFUNDED, WebHookEventSaleRefunded),
+            (HOOK_PLAN_CREATED_V2, WebHookEventPlanCreated),
+            (HOOK_PLAN_UPDATED_V2, WebHookEventPlanUpdated),
             # rest is deprecated, the fallback handler can catch them
-            HOOK_SUBSCRIPTION_CREATED_v1,
-            HOOK_SUBSCRIPTION_CANCELLED_V1,
-            HOOK_PLAN_CREATED_V1,
-            HOOK_PLAN_UPDATED_V1,
+            (HOOK_SUBSCRIPTION_CREATED_v1, WebHookEvent),
+            (HOOK_SUBSCRIPTION_CANCELLED_V1, WebHookEvent),
+            (HOOK_PLAN_CREATED_V1, WebHookEvent),
+            (HOOK_PLAN_UPDATED_V1, WebHookEvent),
         ]:
             headers = dict(const_req.headers)
             headers["paypal-cert-url"] = headers["paypal-cert-url"].replace("https://api.paypal.com/", base_url)
@@ -116,10 +132,6 @@ async def _webhook_check(server_proc: ServerProc, httpserver: HTTPServer):
                 assert r.status == 200
             result = await _get_webhook_result()
             result_key = tuple(result["key"]) if result["key"] is not None else None
-            for event_cls, _ in PayPalWebHookProcessorBase().webhook_handlers.values():
-                if event_cls.HANDLER_KEY == result_key:
-                    event: BaseModel = event_cls.model_validate(json.loads(const_req.body))
-                    assert result["event"] == event.model_dump(mode="json")
-                    break
-            else:
-                assert False, f"webhook handler not for {result_key}"
+            assert result_key == expected_handler.HANDLER_KEY
+            event: BaseModel = expected_handler.model_validate(json.loads(const_req.body))
+            assert result["event"] == event.model_dump(mode="json")

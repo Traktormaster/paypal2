@@ -38,6 +38,22 @@ class WebHookCaptureResourceV2(BaseModel):
     # todo final_capture
 
 
+class WebHookRefundResourceV2(BaseModel):
+    id: str
+    status: str
+    amount: Optional[MonetaryValue] = None
+    supplementary_data: Optional[PaymentSupplementaryData] = None
+    create_time: Optional[datetime] = None
+    update_time: Optional[datetime] = None
+    # links: list[HATEOASLink]
+    # todo seller_protection
+    # todo seller_receivable_breakdown
+    # todo final_capture
+    # todo disbursement_mode
+    # todo invoice_id
+    # todo custom_id
+
+
 class WebHookSubscriptionResourceV2(BaseModel):
     id: str
     status: str
@@ -97,18 +113,28 @@ class WebHookSaleResource(BaseModel):
     custom: Optional[str] = None
 
 
+class WebHookEventCapturePending(WebHookEvent):
+    HANDLER_KEY: ClassVar = ("PAYMENT.CAPTURE.PENDING", "capture", "2.0")
+    resource: WebHookCaptureResourceV2
+
+
 class WebHookEventCaptureCompleted(WebHookEvent):
     HANDLER_KEY: ClassVar = ("PAYMENT.CAPTURE.COMPLETED", "capture", "2.0")
     resource: WebHookCaptureResourceV2
 
 
 class WebHookEventCaptureReversed(WebHookEvent):
-    HANDLER_KEY: ClassVar = ("PAYMENT.CAPTURE.REVERSED", "capture", "2.0")
-    resource: WebHookCaptureResourceV2
+    HANDLER_KEY: ClassVar = ("PAYMENT.CAPTURE.REVERSED", "refund", "2.0")
+    resource: WebHookRefundResourceV2
 
 
 class WebHookEventCaptureRefunded(WebHookEvent):
-    HANDLER_KEY: ClassVar = ("PAYMENT.CAPTURE.REFUNDED", "capture", "2.0")
+    HANDLER_KEY: ClassVar = ("PAYMENT.CAPTURE.REFUNDED", "refund", "2.0")
+    resource: WebHookRefundResourceV2
+
+
+class WebHookEventCaptureDeclined(WebHookEvent):
+    HANDLER_KEY: ClassVar = ("PAYMENT.CAPTURE.DECLINED", "capture", "2.0")
     resource: WebHookCaptureResourceV2
 
 

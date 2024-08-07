@@ -38,9 +38,11 @@ class PayPalWebHookProcessorBase:
         Override this method to remove or extend the used handlers.
         """
         return {
+            # WebHookEventCapturePending: self.event_capture_pending,
             WebHookEventCaptureCompleted: self.event_capture_completed,
             WebHookEventCaptureReversed: self.event_capture_reversed,
             WebHookEventCaptureRefunded: self.event_capture_refunded,
+            # WebHookEventCaptureDeclined: self.event_capture_declined,
             WebHookEventSubscriptionCreated: self.event_subscription_created,
             WebHookEventSubscriptionActivated: self.event_subscription_activated,
             WebHookEventSubscriptionSuspended: self.event_subscription_suspended,
