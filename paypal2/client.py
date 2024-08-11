@@ -278,8 +278,17 @@ class PayPalApiClient:
         data = await self._retry_request("post", "/v1/billing/plans", request)
         return PlanMinimalResponse.model_validate(data)
 
-    async def plan_list(self) -> PlanList:
-        data = await self._retry_request("get", "/v1/billing/plans")
+    async def plan_list(self, product_id: str = None, page_size: int = None, page: int = None) -> PlanList:
+        params = {}
+        if product_id:
+            params["product_id"] = product_id
+        if page_size:
+            params["page_size"] = str(page_size)
+        if page:
+            params["page"] = str(page)
+        data = await self._retry_request(
+            "get", "/v1/billing/plans", None, {"Prefer": "return=representation"}, params or None
+        )
         return PlanList.model_validate(data)
 
     async def plan_details(self, plan_id: str) -> Optional[PlanDetails]:
