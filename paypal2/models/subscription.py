@@ -7,7 +7,7 @@ from paypal2.models.common import HATEOASLink
 
 
 class SubscriptionCreate(BaseModel):
-    id: str = Field(min_length=26, max_length=26)
+    id: str = Field(min_length=6)
     quantity: Optional[str] = Field(min_length=1, max_length=32, default=None)
     custom_id: Optional[str] = Field(min_length=1, max_length=127, default=None)  # can be invoice id
     start_time: Optional[datetime] = None

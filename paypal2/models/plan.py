@@ -13,7 +13,7 @@ class PlanMinimalResponse(BaseModel):
 
 
 class _PlanCommon(BaseModel):
-    product_id: str = Field(min_length=22, max_length=22)
+    product_id: str = Field(min_length=6)
     name: str = Field(min_length=1, max_length=127)
     status: Literal["CREATED", "INACTIVE", "ACTIVE"] = Field(min_length=1, max_length=24, default="ACTIVE")
     description: Optional[str] = Field(min_length=1, max_length=127, default=None)
@@ -27,7 +27,7 @@ class PlanCreate(_PlanCommon):
 
 
 class PlanDetails(_PlanCommon):
-    id: str = Field(min_length=26, max_length=26)
+    id: str = Field(min_length=6)
     create_time: Optional[datetime] = None
     update_time: Optional[datetime] = None
     # todo quantity_supported
@@ -35,7 +35,7 @@ class PlanDetails(_PlanCommon):
 
 
 class PlanListPlan(_PlanCommon):
-    id: str = Field(min_length=26, max_length=26)
+    id: str = Field(min_length=6)
     create_time: Optional[datetime] = None
     update_time: Optional[datetime] = None
     # todo quantity_supported

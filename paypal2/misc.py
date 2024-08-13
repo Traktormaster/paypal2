@@ -1,5 +1,7 @@
 from typing import Optional
 
+import aiohttp
+
 from paypal2.client import PayPalApiClient
 from paypal2.models.common import (
     PlanBillingCycle,
@@ -25,11 +27,21 @@ async def ensure_simple_product_plan(
     Subscription plans should be managed on the PayPal business UI usually.
     This code is mostly provided here for conveniently creating a specific plan-setup during testing.
     """
-    plan_list = await pp.plan_list(product_id, page_size=20)
-    for plan in plan_list.plans:
-        if plan.name == plan_name and plan.product_id == product_id:
-            break
-    else:
+    if plan_fixed_price.currency_code != plan_setup_fee.currency_code:
+        if float(plan_setup_fee.value) == 0:
+            plan_setup_fee = MonetaryValue(currency_code=plan_fixed_price.currency_code, value="0")
+        else:
+            raise ValueError("currency_code must match for price and setup fee")
+    try:
+        plan_list = await pp.plan_list(product_id, page_size=20)
+        for plan in plan_list.plans:
+            if plan.name == plan_name and plan.product_id == product_id:
+                break
+        else:
+            plan = None
+    except aiohttp.ClientResponseError as e:
+        if e.status != 404:
+            raise
         plan = None
     if plan is None:
         product = await pp.product_details(product_id)
