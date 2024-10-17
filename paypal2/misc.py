@@ -9,6 +9,7 @@ from paypal2.models.common import (
     PlanPricingModel,
     PlanFrequency,
     PlanPaymentPreferences,
+    PlanTaxes,
 )
 from paypal2.models.plan import PlanDetails, PlanCreate
 from paypal2.models.product import ProductCreate
@@ -22,6 +23,7 @@ async def ensure_simple_product_plan(
     plan_fixed_price=MonetaryValue(currency_code="USD", value="6"),
     plan_frequency=PlanFrequency(interval_unit="MONTH", interval_count=1),
     plan_setup_fee=MonetaryValue(currency_code="USD", value="0"),
+    plan_taxes: Optional[PlanTaxes] = None,
 ) -> Optional[PlanDetails]:
     """
     Subscription plans should be managed on the PayPal business UI usually.
@@ -61,6 +63,7 @@ async def ensure_simple_product_plan(
                     ),
                 ],
                 payment_preferences=PlanPaymentPreferences(setup_fee=plan_setup_fee),
+                taxes=plan_taxes,
             )
         )
     plan_id = plan.id
